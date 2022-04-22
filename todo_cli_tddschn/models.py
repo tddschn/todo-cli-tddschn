@@ -10,12 +10,12 @@ class TodoBase(SQLModel):
     tags: str | None
     due_date: datetime | None
     project_id: int | None
+    project_id: Optional[int] = Field(default=None, foreign_key="project.id")
 
 
 class Todo(TodoBase, table=True):
     id: int | None = Field(primary_key=True)
     project: Optional['Project'] = Relationship(back_populates='todos')
-    project_id: Optional[int] = Field(default=None, foreign_key="project.id")
 
 
 class TodoCreate(TodoBase):
@@ -27,7 +27,7 @@ class TodoRead(TodoBase):
 
 
 class ProjectBase(SQLModel):
-    name: str
+    name: str = Field(index=True)
 
 
 class Project(ProjectBase, table=True):

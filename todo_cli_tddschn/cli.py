@@ -5,8 +5,10 @@ from pathlib import Path
 import typer
 from . import __app_name__, __version__, config, ERRORS, Status, Priority
 from .config import DEFAULT_DB_FILE_PATH, get_database_path
+from sqlmodel import Session
 from .database import create_db_and_tables, engine
-from .models import Project, Todo
+from .models import Project, Todo, ProjectCreate, ProjectRead, TodoCreate, TodoRead
+from .utils import merge_desc, serialize_tags, deserialize_tags
 
 app = typer.Typer()
 
@@ -124,7 +126,21 @@ def add(
         ),
 ) -> None:
     """Add a new to-do with a DESCRIPTION."""
-    
+    todo_create = TodoCreate(
+        description=merge_desc(description),
+        priority=priority,
+        status=status,
+        tags=serialize_tags(tags),
+        due_date=due_date,
+    )
+    with Session(engine) as session:
+        db_todo = Todo.from_orm(todo_create)
+        session.add(db_todo)
+        session.commit()
+        session.refresh(db_todo)
+        typer.secho(f'Added to-do # {db_todo.id}: "{db_todo.description}"',
+                    fg=typer.colors.GREEN,
+                    err=True)
 
 
 #     todoer = get_todoer()
