@@ -46,3 +46,11 @@ def _create_database(db_path: Path) -> int:
     except OSError:
         return DB_WRITE_ERROR
     return SUCCESS
+
+
+def get_database_path(config_file: Path) -> Path:
+    """Read and returns the current path to the to-do database
+	from the config file."""
+    config_parser = configparser.ConfigParser()
+    config_parser.read(config_file)
+    return Path(config_parser["General"]["database"])
