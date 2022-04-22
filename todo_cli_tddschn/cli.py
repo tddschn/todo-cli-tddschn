@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
+from datetime import datetime
 from pathlib import Path
 import typer
-from . import __app_name__, __version__, config, ERRORS
+from . import __app_name__, __version__, config, ERRORS, Status, Priority
 from .config import DEFAULT_DB_FILE_PATH, get_database_path
 from .database import create_db_and_tables, engine
 from .models import Project, Todo
@@ -93,35 +94,39 @@ def re_init(
 #                     err=True)
 #         raise typer.Exit(1)
 
-# @app.command('a')
-# @app.command()
-# def add(
-#         description: list[str] = typer.Argument(...),
-#         priority: Priority = typer.Option(Priority.MEDIUM,
-#                                           "--priority",
-#                                           "-p",
-#                                           case_sensitive=False),
-#         status: Status = typer.Option(Status.TODO,
-#                                       "--status",
-#                                       "-s",
-#                                       case_sensitive=False),
-#         project: str = typer.Option(
-#             None,
-#             "--project",
-#             "-pr",
-#         ),
-#         tags: list[str] = typer.Option(
-#             None,
-#             "--tags",
-#             "-t",
-#         ),
-#         due_date: datetime = typer.Option(
-#             None,
-#             "--due-date",
-#             "-dd",
-#         ),
-# ) -> None:
-#     """Add a new to-do with a DESCRIPTION."""
+
+@app.command('a')
+@app.command()
+def add(
+        description: list[str] = typer.Argument(...),
+        priority: Priority = typer.Option(Priority.MEDIUM,
+                                          "--priority",
+                                          "-p",
+                                          case_sensitive=False),
+        status: Status = typer.Option(Status.TODO,
+                                      "--status",
+                                      "-s",
+                                      case_sensitive=False),
+        project: str = typer.Option(
+            None,
+            "--project",
+            "-pr",
+        ),
+        tags: list[str] = typer.Option(
+            None,
+            "--tags",
+            "-t",
+        ),
+        due_date: datetime = typer.Option(
+            None,
+            "--due-date",
+            "-dd",
+        ),
+) -> None:
+    """Add a new to-do with a DESCRIPTION."""
+    
+
+
 #     todoer = get_todoer()
 #     curr_todo = todoer.add(description, priority, status, project, tags,
 #                            due_date)

@@ -18,6 +18,14 @@ class Todo(TodoBase, table=True):
     project_id: Optional[int] = Field(default=None, foreign_key="project.id")
 
 
+class TodoCreate(TodoBase):
+    pass
+
+
+class TodoRead(TodoBase):
+    id: int
+
+
 class ProjectBase(SQLModel):
     name: str
 
@@ -25,3 +33,11 @@ class ProjectBase(SQLModel):
 class Project(ProjectBase, table=True):
     id: int | None = Field(primary_key=True)
     todos: Todo | None = Relationship(back_populates='project')
+
+
+class ProjectCreate(ProjectBase):
+    pass
+
+
+class ProjectRead(ProjectBase):
+    id: int
