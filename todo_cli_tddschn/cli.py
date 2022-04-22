@@ -12,7 +12,7 @@ from .models import Project, Todo, ProjectCreate, ProjectRead, TodoCreate, TodoR
 from .utils import merge_desc, serialize_tags, deserialize_tags, todo_to_dict_with_project_name
 from tabulate import tabulate
 
-app = typer.Typer()
+app = typer.Typer(name='todo')
 
 
 def _version_callback(value: bool) -> None:
