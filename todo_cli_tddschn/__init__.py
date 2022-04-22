@@ -1,7 +1,9 @@
 __version__ = '0.1.5'
 __app_name__ = 'todo'
 
+from dataclasses import dataclass
 from enum import Enum
+from typing import Any
 
 try:
     from logging_utils_tddschn import get_logger
@@ -70,7 +72,7 @@ class Status(str, Enum):
 
 @dataclass
 class DBResponse:
-    todo_list: list[TodoItem]
+    # todo_list: list[TodoItem]
     error: int
 
 
@@ -82,5 +84,5 @@ class SessionResponse:
 
 @dataclass
 class CurrentTodo:
-    todo: TodoItem | None
+    # todo: TodoItem | None
     error: int

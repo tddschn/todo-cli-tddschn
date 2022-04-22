@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -13,7 +14,7 @@ class TodoBase(SQLModel):
 
 class Todo(TodoBase, table=True):
     id: int | None
-    project: 'Project' | None = Relationship(back_populates='todos')
+    project: Optional['Project'] = Relationship(back_populates='todos')
 
 
 class ProjectBase(SQLModel):
