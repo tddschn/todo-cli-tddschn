@@ -178,19 +178,21 @@ def list_all() -> None:
 def get_todo(todo_id: int) -> None:
     """Get a to-do by ID."""
     with Session(engine) as session:
-        _get_todo(todo_id, session)
+        _get_todo(todo_id, session, True)
 
 
-def _get_todo(todo_id, session):
+def _get_todo(todo_id, session, output: bool = False) -> Todo:
     todo = session.get(Todo, todo_id)
     if todo is None:
         typer.secho(f'No to-do with id {todo_id}',
                     fg=typer.colors.RED,
                     err=True)
         raise typer.Exit()
-    todo_list = [todo_to_dict_with_project_name(todo)]
-    table = tabulate(todo_list, headers='keys')
-    typer.secho(table)
+    if output:
+        todo_list = [todo_to_dict_with_project_name(todo)]
+        table = tabulate(todo_list, headers='keys')
+        typer.secho(table)
+    return todo
 
 
 # @app.command(name='s')
@@ -205,7 +207,7 @@ def _get_todo(todo_id, session):
 def modify(
         # ctx: typer.Context,
         todo_id: int = typer.Argument(...),
-        desc: str = typer.Option(
+        description: str = typer.Option(
             None,
             "--description",
             "-d",
@@ -239,13 +241,8 @@ def modify(
     # https://click.palletsprojects.com/en/7.x/api/#context
 
     with Session(engine) as session:
-        todo = session.get(Todo, todo_id)
-        if todo is None:
-            typer.secho(f'No to-do with id {todo_id}',
-                        fg=typer.colors.RED,
-                        err=True)
-            raise typer.Exit()
-        todo.desc = desc if desc is not None else todo.description
+        todo = _get_todo(todo_id, session)
+        todo.description = description if description is not None else todo.description
         todo.priority = priority if priority is not None else todo.priority
         todo.status = status if status is not None else todo.status
         todo.project_id = get_project_with_name(
@@ -257,61 +254,33 @@ def modify(
         typer.secho(f'Modified todo # {todo_id}:',
                     fg=typer.colors.GREEN,
                     err=True)
-        _get_todo(todo_id, session)
+        _get_todo(todo_id, session, True)
 
 
-#     todoer = get_todoer()
-#     get = todoer.get_todo(todo_id)
-#     get_error = get.error
-#     if get_error:
-#         typer.secho(f'Getting todo failed with "{ERRORS[get_error]}"',
-#                     fg=typer.colors.RED,
-#                     err=True)
-#         raise typer.Exit(1)
-#     todo_orig = get.todo
-#     logger.info(f"todo_orig: {todo_orig}")
-#     # from icecream import ic
-#     # pri = todo_orig.priority # type: ignore
-#     # ic(pri, type(pri)) # type: ignore
-#     assert todo_orig is not None
-#     desc = desc if desc is not None else todo_orig.description
-#     priority = priority if priority is not None else todo_orig.priority
-#     status = status if status is not None else todo_orig.status
-#     project = project if project is not None else todo_orig.project
-#     tags = tags if tags is not None else deserialize_tags(todo_orig.tags)
-#     due_date_opt = due_date if due_date is not None else todo_orig.due_date
+@app.command('rm')
+@app.command()
+def remove(
+    todo_id: int = typer.Argument(...),
+    force: bool = typer.Option(
+        False,
+        "--force",
+        "-f",
+        help="Force deletion without confirmation.",
+    ),
+) -> None:
+    """Remove a to-do using its TODO_ID."""
+    with Session(engine) as session:
+        todo = _get_todo(todo_id, session)
+        if not force:
+            typer.confirm(f'Are you sure you want to delete todo # {todo_id}?',
+                          abort=True)
+        session.delete(todo)
+        session.commit()
+        typer.secho(f'Removed todo # {todo_id}',
+                    fg=typer.colors.GREEN,
+                    err=True)
 
-#     modify = todoer.modify(todo_id, desc, priority, status, project, tags,
-#                            due_date_opt)
-#     todo = modify.todo
-#     error = modify.error
-#     if error:
-#         typer.secho(
-#             f'Modifying to-do # "{todo_id}" failed with "{ERRORS[error]}"',
-#             fg=typer.colors.RED,
-#             err=True)
-#         raise typer.Exit(1)
-#     else:
-#         assert todo is not None
-#         typer.secho(f"""to-do # {todo_id} modified!""",
-#                     fg=typer.colors.GREEN,
-#                     err=True)
-#         todo_list = [row2dict(todo)]
-#         table = tabulate(todo_list, headers='keys')
-#         typer.secho(table)
 
-# @app.command('rm')
-# @app.command()
-# def remove(
-#     todo_id: int = typer.Argument(...),
-#     force: bool = typer.Option(
-#         False,
-#         "--force",
-#         "-f",
-#         help="Force deletion without confirmation.",
-#     ),
-# ) -> None:
-#     """Remove a to-do using its TODO_ID."""
 #     todoer = get_todoer()
 
 #     def _remove(todo: TodoItem):
