@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from datetime import datetime
+from msilib import init_database
 from pathlib import Path
 import typer
 from . import __app_name__, __version__, config, ERRORS, Status, Priority
@@ -21,15 +22,16 @@ def _version_callback(value: bool) -> None:
         raise typer.Exit()
 
 
+init_db_path_opt = typer.Option(
+    DEFAULT_DB_FILE_PATH,
+    "--db-path",
+    "-db",
+    prompt="to-do database location?",
+)
+
+
 @app.command()
-def init(
-    db_path: Path = typer.Option(
-        DEFAULT_DB_FILE_PATH,
-        "--db-path",
-        "-db",
-        prompt="to-do database location?",
-    ),
-) -> None:
+def init(db_path: Path = init_db_path_opt) -> None:
     """Initialize the to-do database."""
     app_init_error = config.init_app(db_path)
     if app_init_error:
@@ -52,12 +54,7 @@ def init(
 
 @app.command()
 def re_init(
-    db_path: Path = typer.Option(
-        DEFAULT_DB_FILE_PATH,
-        "--db-path",
-        "-db",
-        prompt="to-do database location?",
-    ),
+    db_path: Path = init_db_path_opt,
     force: bool = typer.Option(False,
                                "--force",
                                "-f",

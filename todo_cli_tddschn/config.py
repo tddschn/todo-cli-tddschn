@@ -11,6 +11,8 @@ DEFAULT_DB_FILE_PATH = Path.home() / '.todo-cli-tddschn.db'
 CONFIG_DIR_PATH = Path(typer.get_app_dir(__app_name__))
 CONFIG_FILE_PATH = CONFIG_DIR_PATH / "config.ini"
 
+app = typer.Typer(name='config')
+
 
 def init_app(db_path: Path) -> int:
     """Initialize the application.
@@ -50,7 +52,18 @@ def _create_database(db_path: Path) -> int:
 
 def get_database_path(config_file: Path) -> Path:
     """Read and returns the current path to the to-do database
-	from the config file."""
+    from the config file."""
     config_parser = configparser.ConfigParser()
     config_parser.read(config_file)
     return Path(config_parser["General"]["database"])
+
+
+@app.command('db-path')
+def get_db_path():
+    """Get the path to the to-do database."""
+    p = get_database_path(CONFIG_FILE_PATH)
+    typer.secho(str(p))
+
+
+if __name__ == '__main__':
+    app()

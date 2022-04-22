@@ -2,6 +2,9 @@ import json
 from sqlmodel import Session, select
 from .database import engine
 from .models import Project, Todo
+import typer
+
+app = typer.Typer(name='utils')
 
 
 def merge_desc(desc_l: list[str]) -> str:
@@ -48,3 +51,6 @@ def serialize_tags(tags: list[str]) -> str:
 
 def deserialize_tags(tags_s: str) -> list[str]:
     return json.loads(tags_s)
+
+
+'

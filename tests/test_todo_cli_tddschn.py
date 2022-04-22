@@ -23,3 +23,15 @@ class TestTodo:
         result = self.runner.invoke(app, ["--version"])
         assert result.exit_code == 0
         assert f"{__app_name__} v{__version__}\n" == result.output
+
+    def test_init(self):
+        result = self.runner.invoke(app, ["init", "--db-path", self.db_path])
+        assert result.exit_code == 0
+        assert "Database created successfully" in result.output
+
+    def test_re_init(self):
+        result = self.runner.invoke(app,
+                                    ['re-init', '--db-path', self.db_path],
+                                    input='y\n')
+        assert result.exit_code == 0
+        assert "Database created successfully" in result.output
