@@ -6,7 +6,7 @@ import typer
 from . import __app_name__, __version__, config, ERRORS, Status, Priority
 from . import get_logger, _DEBUG
 from .config import DEFAULT_DB_FILE_PATH, get_database_path
-from sqlmodel import Session
+from sqlmodel import Session, delete
 from .database import create_db_and_tables, engine, get_project_with_name
 from .models import Project, Todo, ProjectCreate, ProjectRead, TodoCreate, TodoRead
 from .utils import merge_desc, serialize_tags, deserialize_tags, todo_to_dict_with_project_name
@@ -80,23 +80,6 @@ def re_init(
             "Are you sure you want to re-initialize the to-do database?",
             abort=True)
         _re_init(db_path)
-
-
-# def get_todoer() -> Todoer:
-#     if config.CONFIG_FILE_PATH.exists():
-#         db_path = get_database_path(config.CONFIG_FILE_PATH)
-#     else:
-#         typer.secho('Config file not found. Please, run "todo init"',
-#                     fg=typer.colors.RED,
-#                     err=True)
-#         raise typer.Exit(1)
-#     if db_path.exists():
-#         return Todoer(db_path)
-#     else:
-#         typer.secho('Database not found. Please, run "todo init"',
-#                     fg=typer.colors.RED,
-#                     err=True)
-#         raise typer.Exit(1)
 
 
 @app.command('a')
@@ -281,68 +264,22 @@ def remove(
                     err=True)
 
 
-#     todoer = get_todoer()
-
-#     def _remove(todo: TodoItem):
-#         remove = todoer.remove(todo_id)
-#         logger.info(f"remove: {remove}")
-#         error = remove.error
-#         if error:
-#             typer.secho(
-#                 f'Removing to-do # {todo_id}: {todo.description} failed with "{ERRORS[error]}"',
-#                 fg=typer.colors.RED,
-#                 err=True)
-#             raise typer.Exit(1)
-#         else:
-#             typer.secho(f"""to-do # {todo_id}: {todo.description} removed!""",
-#                         fg=typer.colors.GREEN,
-#                         err=True)
-
-#     get = todoer.get_todo(todo_id)
-#     error = get.error
-#     todo = get.todo
-#     assert todo is not None
-#     if error:
-#         typer.secho(
-#             f'Getting to-do # "{todo_id}" failed with "{ERRORS[error]}"',
-#             fg=typer.colors.RED,
-#             err=True)
-#         raise typer.Exit(1)
-
-#     if force:
-#         _remove(todo)
-#     else:
-#         assert todo is not None
-#         delete = typer.confirm(
-#             f"Delete to-do # {todo_id}: {todo.description}?", err=True)
-#         if delete:
-#             _remove(todo)
-#         else:
-#             typer.echo("Operation canceled")
-
-# @app.command(name="clear")
-# def remove_all(
-#     force: bool = typer.Option(
-#         ...,
-#         prompt="Delete all to-dos?",
-#         help="Force deletion without confirmation.",
-#     ),
-# ) -> None:
-#     """Remove all to-dos."""
-#     todoer = get_todoer()
-#     if force:
-#         remove = todoer.remove_all()
-#         error = remove
-#         if error:
-#             typer.secho(
-#                 f'Removing to-dos failed with "{ERRORS[error]}"',
-#                 fg=typer.colors.RED,
-#             )
-#             raise typer.Exit(1)
-#         else:
-#             typer.secho("All to-dos were removed", fg=typer.colors.GREEN)
-#     else:
-#         typer.echo("Operation canceled")
+@app.command(name="clear")
+def remove_all(
+    force: bool = typer.Option(
+        ...,
+        prompt="Delete all to-dos?",
+        help="Force deletion without confirmation.",
+    ),
+) -> None:
+    """Remove all to-dos."""
+    with Session(engine) as session:
+        statement = delete(Todo)
+        result = session.exec(statement)  # type: ignore
+        session.commit()
+        typer.secho(f'Removed {result.rowcount} to-dos',
+                    fg=typer.colors.GREEN,
+                    err=True)
 
 
 @app.callback()
