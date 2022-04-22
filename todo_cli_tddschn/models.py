@@ -14,7 +14,7 @@ class TodoBase(SQLModel):
 
 
 class Todo(TodoBase, table=True):
-    id: int | None = Field(primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     project: Optional['Project'] = Relationship(back_populates='todos')
 
 
@@ -31,7 +31,7 @@ class ProjectBase(SQLModel):
 
 
 class Project(ProjectBase, table=True):
-    id: int | None = Field(primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     todos: Todo | None = Relationship(back_populates='project')
 
 

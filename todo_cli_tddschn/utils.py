@@ -1,5 +1,7 @@
 import json
-# from todo_cli_typer import TodoItem
+from sqlmodel import Session, select
+from .database import engine
+from .models import Project, Todo
 
 
 def merge_desc(desc_l: list[str]) -> str:
@@ -18,18 +20,25 @@ def merge_desc(desc_l: list[str]) -> str:
 #     }
 
 
-def row2dict(row) -> dict:
-    d = row.__dict__
+def todo_to_dict_with_project_name(todo: Todo) -> dict:
+    d = todo.__dict__
     d.pop('_sa_instance_state', None)
     # from icecream import ic
     # ic(d)
-    d_ordered = {
-        k: d[k]
-        for k in [
-            'id', 'description', 'priority', 'status', 'project', 'tags',
-            'due_date'
-        ]
-    }
+    attr_list_1 = ['id', 'description', 'priority', 'status']
+    attr_list_2 = ['tags', 'due_date']
+    d_ordered = {k: d[k] for k in attr_list_1}
+    if d['project_id'] is not None:
+        project_id = d['project_id']
+        with Session(engine) as session:
+            project = session.get(Project, project_id)
+            assert project is not None
+            d_ordered['project'] = project.name
+    else:
+        d_ordered['project'] = None
+
+    d_ordered |= {k: d[k] for k in attr_list_2}
+
     return d_ordered
 
 

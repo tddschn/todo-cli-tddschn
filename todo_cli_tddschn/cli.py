@@ -4,11 +4,13 @@ from datetime import datetime
 from pathlib import Path
 import typer
 from . import __app_name__, __version__, config, ERRORS, Status, Priority
+from . import get_logger, _DEBUG
 from .config import DEFAULT_DB_FILE_PATH, get_database_path
 from sqlmodel import Session
-from .database import create_db_and_tables, engine
+from .database import create_db_and_tables, engine, get_project_with_name
 from .models import Project, Todo, ProjectCreate, ProjectRead, TodoCreate, TodoRead
-from .utils import merge_desc, serialize_tags, deserialize_tags
+from .utils import merge_desc, serialize_tags, deserialize_tags, todo_to_dict_with_project_name
+from tabulate import tabulate
 
 app = typer.Typer()
 
@@ -132,6 +134,7 @@ def add(
         status=status,
         tags=serialize_tags(tags),
         due_date=due_date,
+        project_id=get_project_with_name(project).id if project else None,
     )
     with Session(engine) as session:
         db_todo = Todo.from_orm(todo_create)
@@ -143,62 +146,48 @@ def add(
                     err=True)
 
 
-#     todoer = get_todoer()
-#     curr_todo = todoer.add(description, priority, status, project, tags,
-#                            due_date)
-#     error = curr_todo.error
-#     todo = curr_todo.todo
-#     if error:
-#         typer.secho(f'Adding to-do failed with "{ERRORS[error]}"',
-#                     fg=typer.colors.RED,
-#                     err=True)
-#         raise typer.Exit(1)
-#     else:
-#         typer.secho(
-#             f"""to-do: "{todo.description}" was added """  # type: ignore
-#             f"""with priority: {priority}""",
-#             fg=typer.colors.GREEN,
-#             err=True)
+@app.command(name="list")
+@app.command(name="ls")
+def list_all() -> None:
+    """list all to-dos."""
+    with Session(engine) as session:
+        todos = session.query(Todo).all()
+        todo_list = [todo_to_dict_with_project_name(x) for x in todos]
+    # for x in todos:
+    #     print(x)
+    #     print(x.__dict__)
+    #     return
+    if len(todo_list) == 0:
+        typer.secho("There are no tasks in the to-do list yet",
+                    fg=typer.colors.RED,
+                    err=True)
+        raise typer.Exit()
+    typer.secho("\nto-do list:\n", fg=typer.colors.BLUE, bold=True)
+    # tabulate(todo_list, headers=['id', 'description', 'priority', 'status', 'project', 'tags', 'due_date'])
+    table = tabulate(todo_list, headers='keys')
+    typer.secho(table)
 
-# @app.command(name="list")
-# @app.command(name="ls")
-# def list_all() -> None:
-#     """list all to-dos."""
-#     todoer = get_todoer()
-#     todo_item_list = todoer.get_todo_all()
-#     logger.info(f"todo_item_list: {todo_item_list}")
-#     todo_list = [row2dict(x) for x in todo_item_list]
-#     if len(todo_list) == 0:
-#         typer.secho("There are no tasks in the to-do list yet",
-#                     fg=typer.colors.RED,
-#                     err=True)
-#         raise typer.Exit()
-#     typer.secho("\nto-do list:\n", fg=typer.colors.BLUE, bold=True)
-#     # tabulate(todo_list, headers=['id', 'description', 'priority', 'status', 'project', 'tags', 'due_date'])
-#     table = tabulate(todo_list, headers='keys')
-#     typer.secho(table)
 
-# # @app.command(name="complete")
-# # @app.command(name="comp")
-# # def
+# @app.command(name="complete")
+# @app.command(name="comp")
+# def
 
-# @app.command(name='g')
-# @app.command(name='get')
-# def get_todo(todo_id: int) -> None:
-#     """Get a to-do by ID."""
-#     todoer = get_todoer()
-#     todo = todoer.get_todo(todo_id)
-#     error = todo.error
-#     todo = todo.todo
-#     if error:
-#         typer.secho(f'Getting todo failed with "{ERRORS[error]}"',
-#                     fg=typer.colors.RED,
-#                     err=True)
-#         raise typer.Exit(1)
-#     else:
-#         todo_list = [row2dict(todo)]
-#         table = tabulate(todo_list, headers='keys')
-#         typer.secho(table)
+
+@app.command(name='g')
+@app.command(name='get')
+def get_todo(todo_id: int) -> None:
+    """Get a to-do by ID."""
+    with Session(engine) as session:
+        todo = session.get(Todo, todo_id)
+        if todo is None:
+            typer.secho(f'No to-do with id {todo_id}',
+                        fg=typer.colors.RED,
+                        err=True)
+            raise typer.Exit()
+        todo_list = [todo_to_dict_with_project_name(todo)]
+        table = tabulate(todo_list, headers='keys')
+        typer.secho(table)
+
 
 # @app.command(name='s')
 # @app.command(name='set')
@@ -206,40 +195,43 @@ def add(
 #     """Set a todo's status using its TODO_ID."""
 #     modify(todo_id, status=status)
 
-# @app.command(name='m')
-# @app.command(name='modify')
-# def modify(
-#         todo_id: int = typer.Argument(...),
-#         desc: str = typer.Option(
-#             None,
-#             "--description",
-#             "-d",
-#         ),
-#         priority: Priority = typer.Option(None,
-#                                           "--priority",
-#                                           "-p",
-#                                           case_sensitive=False),
-#         status: Status = typer.Option(None,
-#                                       "--status",
-#                                       "-s",
-#                                       case_sensitive=False),
-#         project: str = typer.Option(
-#             None,
-#             "--project",
-#             "-pr",
-#         ),
-#         tags: list[str] = typer.Option(
-#             None,
-#             "--tags",
-#             "-t",
-#         ),
-#         due_date: datetime = typer.Option(
-#             None,
-#             "--due-date",
-#             "-dd",
-#         ),
-# ) -> None:
-#     """Modify a to-do by setting it as done using its TODO_ID."""
+
+@app.command(name='m')
+@app.command(name='modify')
+def modify(
+        todo_id: int = typer.Argument(...),
+        desc: str = typer.Option(
+            None,
+            "--description",
+            "-d",
+        ),
+        priority: Priority = typer.Option(None,
+                                          "--priority",
+                                          "-p",
+                                          case_sensitive=False),
+        status: Status = typer.Option(None,
+                                      "--status",
+                                      "-s",
+                                      case_sensitive=False),
+        project: str = typer.Option(
+            None,
+            "--project",
+            "-pr",
+        ),
+        tags: list[str] = typer.Option(
+            None,
+            "--tags",
+            "-t",
+        ),
+        due_date: datetime = typer.Option(
+            None,
+            "--due-date",
+            "-dd",
+        ),
+) -> None:
+    """Modify a to-do by setting it as done using its TODO_ID."""
+
+
 #     todoer = get_todoer()
 #     get = todoer.get_todo(todo_id)
 #     get_error = get.error
