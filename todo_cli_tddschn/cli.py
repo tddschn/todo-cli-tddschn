@@ -136,17 +136,12 @@ def list_all() -> None:
     with Session(engine) as session:
         todos = session.query(Todo).all()
         todo_list = [todo_to_dict_with_project_name(x) for x in todos]
-    # for x in todos:
-    #     print(x)
-    #     print(x.__dict__)
-    #     return
     if len(todo_list) == 0:
         typer.secho("There are no tasks in the to-do list yet",
                     fg=typer.colors.RED,
                     err=True)
         raise typer.Exit()
     typer.secho("\nto-do list:\n", fg=typer.colors.BLUE, bold=True)
-    # tabulate(todo_list, headers=['id', 'description', 'priority', 'status', 'project', 'tags', 'due_date'])
     table = tabulate(todo_list, headers='keys')
     typer.secho(table)
 
