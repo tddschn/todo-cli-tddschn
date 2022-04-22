@@ -9,7 +9,6 @@ class TodoBase(SQLModel):
     status: str = Field(default='todo')
     tags: str | None
     due_date: datetime | None
-    project_id: int | None
     project_id: Optional[int] = Field(default=None, foreign_key="project.id")
 
 

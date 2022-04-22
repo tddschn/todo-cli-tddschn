@@ -178,15 +178,19 @@ def list_all() -> None:
 def get_todo(todo_id: int) -> None:
     """Get a to-do by ID."""
     with Session(engine) as session:
-        todo = session.get(Todo, todo_id)
-        if todo is None:
-            typer.secho(f'No to-do with id {todo_id}',
-                        fg=typer.colors.RED,
-                        err=True)
-            raise typer.Exit()
-        todo_list = [todo_to_dict_with_project_name(todo)]
-        table = tabulate(todo_list, headers='keys')
-        typer.secho(table)
+        _get_todo(todo_id, session)
+
+
+def _get_todo(todo_id, session):
+    todo = session.get(Todo, todo_id)
+    if todo is None:
+        typer.secho(f'No to-do with id {todo_id}',
+                    fg=typer.colors.RED,
+                    err=True)
+        raise typer.Exit()
+    todo_list = [todo_to_dict_with_project_name(todo)]
+    table = tabulate(todo_list, headers='keys')
+    typer.secho(table)
 
 
 # @app.command(name='s')
@@ -199,6 +203,7 @@ def get_todo(todo_id: int) -> None:
 @app.command(name='m')
 @app.command(name='modify')
 def modify(
+        # ctx: typer.Context,
         todo_id: int = typer.Argument(...),
         desc: str = typer.Option(
             None,
@@ -230,6 +235,29 @@ def modify(
         ),
 ) -> None:
     """Modify a to-do by setting it as done using its TODO_ID."""
+    # print(ctx.args)
+    # https://click.palletsprojects.com/en/7.x/api/#context
+
+    with Session(engine) as session:
+        todo = session.get(Todo, todo_id)
+        if todo is None:
+            typer.secho(f'No to-do with id {todo_id}',
+                        fg=typer.colors.RED,
+                        err=True)
+            raise typer.Exit()
+        todo.desc = desc if desc is not None else todo.description
+        todo.priority = priority if priority is not None else todo.priority
+        todo.status = status if status is not None else todo.status
+        todo.project_id = get_project_with_name(
+            project).id if project is not None else todo.project_id
+        todo.tags = serialize_tags(tags) if tags is not None else todo.tags
+        todo.due_date = due_date if due_date is not None else todo.due_date
+        session.add(todo)
+        session.commit()
+        typer.secho(f'Modified todo # {todo_id}:',
+                    fg=typer.colors.GREEN,
+                    err=True)
+        _get_todo(todo_id, session)
 
 
 #     todoer = get_todoer()
