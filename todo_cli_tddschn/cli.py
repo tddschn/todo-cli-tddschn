@@ -3,7 +3,7 @@
 from datetime import datetime
 from pathlib import Path
 import typer
-from . import __app_name__, __version__, config, list_command, info_command, Status, Priority
+from . import __app_name__, __version__, __app_name_full__, config, list_command, info_command, Status, Priority
 from . import logger, _DEBUG
 from .config import DEFAULT_DB_FILE_PATH, get_database_path
 from sqlmodel import Session, delete
@@ -50,6 +50,31 @@ def _version_callback(value: bool) -> None:
 #     global logger
 #     global _DEBUG
 #     logger, _DEBUG = get_logger(do_log=value)
+
+
+@app.command()
+def serve(
+    host: str = '127.0.0.1',
+    port: int = 5000,
+    log_level: str = 'info',
+):
+    """
+    serve REST API.
+    Go to /docs for interactive documentation on API usage.
+    """
+    try:
+        import uvicorn  # type: ignore
+        from .app import app
+        uvicorn.run(app, host=host, port=port, log_level=log_level)
+    except ModuleNotFoundError:
+        typer.secho(
+            f'uvicorn or fastapi not installed.\n'
+            f'Install it with `pip install uvicorn fastapi`\n'
+            f'Or `pip install {__app_name_full__}[api]`',
+            fg=typer.colors.RED,
+            err=True)
+        raise typer.Abort()
+
 
 init_db_path_opt = typer.Option(
     DEFAULT_DB_FILE_PATH,

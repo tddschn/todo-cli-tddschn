@@ -10,6 +10,7 @@ A simple command-line Todo app made with typer and sqlite
 	- [Usage](#usage)
 		- [todo](#todo)
 		- [todo ls](#todo-ls)
+		- [todo serve](#todo-serve)
 		- [todo config](#todo-config)
 		- [todo info](#todo-info)
 	- [Why do you made this?](#why-do-you-made-this)
@@ -20,6 +21,7 @@ A simple command-line Todo app made with typer and sqlite
 - Creating, reading, updating, and deleting todos;
 - Nicely formatting the outputs (with color);
 - `todo ls` lists all todos, ordered by priority and due date, the todos without a due date are put last (nullslast).
+- Not only the command line interface - you can also CRUD your todos by making HTTP requests to the [REST API](#todo-serve).
 
 ## Install
 
@@ -90,6 +92,23 @@ Options:
 Commands:
   project  Filter to-dos by project.
   tag      Filter to-dos by tag.
+```
+
+### todo serve
+
+Serve the REST API (built with FastAPI)
+
+```
+todo serve --help
+Usage: todo serve [OPTIONS]
+
+  serve REST API. Go to /docs for interactive documentation on API usage.
+
+Options:
+  --host TEXT       [default: 127.0.0.1]
+  --port INTEGER    [default: 5000]
+  --log-level TEXT  [default: info]
+  --help            Show this message and exit.
 ```
 
 ### todo config
