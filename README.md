@@ -1,6 +1,6 @@
 # todo-cli-tddschn
 
-A simple command-line Todo app with typer and sqlite
+A simple command-line Todo app made with typer and sqlite
 
 - [todo-cli-tddschn](#todo-cli-tddschn)
 	- [Install](#install)
