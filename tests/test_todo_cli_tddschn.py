@@ -40,7 +40,8 @@ class TestTodo:
 
     @classmethod
     def teardown_class(cls):
-        os.unlink(cls.db_path)
+        if os.getenv('TEST_NO_RM_DB') is None:
+            os.unlink(cls.db_path)
 
     def test_version(self):
         result = self.runner.invoke(app, ["--version"])
@@ -115,3 +116,12 @@ class TestTodo:
         result = self.runner.invoke(app, ['re-init'], input='\ny\n')
         assert result.exit_code == 0
         assert "Database created successfully" in result.output
+
+    @pytest.mark.parametrize('cmd', [([
+        'finish', 'cooking', 'eva', '-dd', '2121-12-11', '-pr', 'eva', '-s',
+        'wip'
+    ]), (['eat', 'eva', '-p', 'high', '-t', 'lol', '-t', 'dinner']),
+                                     (['test'])])
+    def test_add2(self, cmd):
+        result = self.runner.invoke(app, ['a', *cmd])
+        assert result.exit_code == 0
