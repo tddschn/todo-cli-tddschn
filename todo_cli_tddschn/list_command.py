@@ -4,7 +4,7 @@ from pathlib import Path
 from . import __app_name__, __version__, config, Status, Priority
 from . import logger, _DEBUG
 from .config import DEFAULT_DB_FILE_PATH, get_database_path
-from sqlmodel import Session, delete, case, nullslast
+from sqlmodel import Session, delete, case, nullslast, select, col
 from .database import create_db_and_tables, engine, get_project_with_name
 from .models import Project, Todo, ProjectCreate, ProjectRead, TodoCreate, TodoRead
 from .utils import merge_desc, serialize_tags, deserialize_tags, todo_to_dict_with_project_name
@@ -37,9 +37,19 @@ def _list_todos(todos: list[Todo]):
 
 @app.callback(invoke_without_command=True)
 def order_by_priority_then_due_date():
+    """list all to-dos, ordered by priority and due date."""
     whens = {'low': 0, 'medium': 1, 'high': 2}
     sort_logic = case(value=Todo.priority, whens=whens).label("priority")
     with Session(engine) as session:
         todos = session.query(Todo).order_by(sort_logic.desc(),
                                              nullslast(Todo.due_date)).all()
+    _list_todos(todos)
+
+
+@app.command('tag')
+def filter_by_tags(tag: str):
+    """Filter to-dos by tag."""
+    with Session(engine) as session:
+        todos = session.exec(
+            select(Todo).where(col(Todo.tags).like(f"%{tag}%"))).all()
     _list_todos(todos)
