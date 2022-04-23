@@ -51,6 +51,3 @@ def serialize_tags(tags: list[str]) -> str:
 
 def deserialize_tags(tags_s: str) -> list[str]:
     return json.loads(tags_s)
-
-
-'

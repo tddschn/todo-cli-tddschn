@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from datetime import datetime
-from msilib import init_database
 from pathlib import Path
 import typer
 from . import __app_name__, __version__, config, ERRORS, Status, Priority
@@ -14,6 +13,7 @@ from .utils import merge_desc, serialize_tags, deserialize_tags, todo_to_dict_wi
 from tabulate import tabulate
 
 app = typer.Typer(name='todo')
+app.add_typer(config.app, name='config')
 
 
 def _version_callback(value: bool) -> None:
@@ -80,7 +80,7 @@ def re_init(
 
 
 @app.command('a')
-@app.command()
+# @app.command()
 def add(
         description: list[str] = typer.Argument(...),
         priority: Priority = typer.Option(Priority.MEDIUM,
@@ -126,7 +126,7 @@ def add(
                     err=True)
 
 
-@app.command(name="list")
+# @app.command(name="list")
 @app.command(name="ls")
 def list_all() -> None:
     """list all to-dos."""
@@ -149,7 +149,7 @@ def list_all() -> None:
 
 
 @app.command(name='g')
-@app.command(name='get')
+# @app.command(name='get')
 def get_todo(todo_id: int) -> None:
     """Get a to-do by ID."""
     with Session(engine) as session:
@@ -178,7 +178,7 @@ def _get_todo(todo_id, session, output: bool = False) -> Todo:
 
 
 @app.command(name='m')
-@app.command(name='modify')
+# @app.command(name='modify')
 def modify(
         # ctx: typer.Context,
         todo_id: int = typer.Argument(...),
@@ -233,7 +233,7 @@ def modify(
 
 
 @app.command('rm')
-@app.command()
+# @app.command()
 def remove(
     todo_id: int = typer.Argument(...),
     force: bool = typer.Option(
@@ -283,6 +283,9 @@ def main(version: bool = typer.Option(
     callback=_version_callback,
     is_eager=True,
 )) -> None:
+    """
+    tddschn's command line todo app
+    """
     return
 
 

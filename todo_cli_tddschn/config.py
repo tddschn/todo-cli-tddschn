@@ -6,6 +6,7 @@ from pathlib import Path
 import typer
 
 from . import DB_WRITE_ERROR, DIR_ERROR, FILE_ERROR, SUCCESS, __app_name__
+from . import logger
 
 DEFAULT_DB_FILE_PATH = Path.home() / '.todo-cli-tddschn.db'
 CONFIG_DIR_PATH = Path(typer.get_app_dir(__app_name__))
@@ -29,9 +30,6 @@ def _init_config_file() -> int:
     """touch the config file."""
     try:
         CONFIG_DIR_PATH.mkdir(exist_ok=True)
-    except OSError:
-        return DIR_ERROR
-    try:
         CONFIG_FILE_PATH.touch(exist_ok=True)
     except OSError:
         return FILE_ERROR
@@ -53,9 +51,25 @@ def _create_database(db_path: Path) -> int:
 def get_database_path(config_file: Path) -> Path:
     """Read and returns the current path to the to-do database
     from the config file."""
+    logger.info(f"Reading database path from {config_file}")
     config_parser = configparser.ConfigParser()
     config_parser.read(config_file)
     return Path(config_parser["General"]["database"])
+
+
+@app.command('path')
+def get_config_path() -> str:
+    """Get the path to the config file."""
+    config_path: str = str(CONFIG_FILE_PATH)
+    typer.secho(config_path)
+    return config_path
+
+
+@app.command('edit')
+def edit_config() -> None:
+    """Edit the config file."""
+    typer.echo(f"Opening the config file at {CONFIG_FILE_PATH}")
+    typer.launch(f"{CONFIG_FILE_PATH}")
 
 
 @app.command('db-path')
@@ -63,6 +77,11 @@ def get_db_path():
     """Get the path to the to-do database."""
     p = get_database_path(CONFIG_FILE_PATH)
     typer.secho(str(p))
+
+
+@app.callback()
+def main():
+    """Getting and managing the config"""
 
 
 if __name__ == '__main__':

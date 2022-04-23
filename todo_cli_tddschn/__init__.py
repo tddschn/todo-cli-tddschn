@@ -1,5 +1,6 @@
 __version__ = '0.2.1'
 __app_name__ = 'todo'
+__app_name_full__ = 'todo-cli-tddschn'
 
 from dataclasses import dataclass
 from enum import Enum
