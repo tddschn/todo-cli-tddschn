@@ -5,7 +5,7 @@ from pathlib import Path
 
 import typer
 
-from . import DB_WRITE_ERROR, DIR_ERROR, FILE_ERROR, SUCCESS, __app_name__
+from . import TodoInitError, __app_name__
 from . import logger
 
 DEFAULT_DB_FILE_PATH = Path.home() / '.todo-cli-tddschn.db'
@@ -15,37 +15,24 @@ CONFIG_FILE_PATH = CONFIG_DIR_PATH / "config.ini"
 app = typer.Typer(name='config')
 
 
-def init_app(db_path: Path) -> int:
+def init_app(db_path: Path, config_file_path: Path = CONFIG_FILE_PATH):
     """Initialize the application.
     get the config file,
     and add db_path to the config file"""
-    config_code = _init_config_file()
-    if config_code != SUCCESS:
-        return config_code
-    create_db = _create_database(db_path)
-    return create_db
-
-
-def _init_config_file() -> int:
-    """touch the config file."""
-    try:
-        CONFIG_DIR_PATH.mkdir(exist_ok=True)
-        CONFIG_FILE_PATH.touch(exist_ok=True)
-    except OSError:
-        return FILE_ERROR
-    return SUCCESS
-
-
-def _create_database(db_path: Path) -> int:
-    """write db_path to config file."""
     config_parser = configparser.ConfigParser()
     config_parser["General"] = {"database": str(db_path)}
     try:
+        config_file_path.parent.mkdir(exist_ok=True)
+        config_file_path.touch(exist_ok=True)
         with CONFIG_FILE_PATH.open("w") as file:
             config_parser.write(file)
-    except OSError:
-        return DB_WRITE_ERROR
-    return SUCCESS
+        typer.secho(f"Config file created at {config_file_path}",
+                    fg=typer.colors.GREEN)
+    except:
+        # raise TodoInitError(f'Creating config file {config_file_path} failed')
+        typer.secho(f'Creating config file {config_file_path} failed',
+                    fg=typer.colors.RED)
+        raise typer.Exit(1)
 
 
 def get_database_path(config_file: Path) -> Path:

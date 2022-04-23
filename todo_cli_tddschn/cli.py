@@ -3,7 +3,7 @@
 from datetime import datetime
 from pathlib import Path
 import typer
-from . import __app_name__, __version__, config, ERRORS, Status, Priority
+from . import __app_name__, __version__, config, Status, Priority
 from . import get_logger, _DEBUG
 from .config import DEFAULT_DB_FILE_PATH, get_database_path
 from sqlmodel import Session, delete
@@ -31,15 +31,10 @@ init_db_path_opt = typer.Option(
 
 
 @app.command()
-def init(db_path: Path = init_db_path_opt) -> None:
+def init(db_path: Path = init_db_path_opt,
+         config_file_path: Path = config.CONFIG_FILE_PATH) -> None:
     """Initialize the to-do database."""
-    app_init_error = config.init_app(db_path)
-    if app_init_error:
-        typer.secho(
-            f'Creating config file failed with "{ERRORS[app_init_error]}"',
-            fg=typer.colors.RED,
-            err=True)
-        raise typer.Exit(1)
+    config.init_app(db_path, config_file_path)
     try:
         create_db_and_tables()
         typer.secho('Database created successfully',
@@ -55,6 +50,7 @@ def init(db_path: Path = init_db_path_opt) -> None:
 @app.command()
 def re_init(
     db_path: Path = init_db_path_opt,
+    config_file_path: Path = config.CONFIG_FILE_PATH,
     force: bool = typer.Option(False,
                                "--force",
                                "-f",
@@ -62,21 +58,21 @@ def re_init(
 ) -> None:
     """Re-initialize the to-do database."""
 
-    def _re_init(db_path: Path):
+    def _re_init(db_path: Path, config_file_path):
         # delete the old database
         old_db_path = get_database_path(config.CONFIG_FILE_PATH)
         old_db_path.unlink(missing_ok=True)
 
         # initialize the new database
-        init(db_path=db_path)
+        init(db_path=db_path, config_file_path=config_file_path)
 
     if force:
-        _re_init(db_path)
+        _re_init(db_path, config_file_path)
     else:
         typer.confirm(
             "Are you sure you want to re-initialize the to-do database?",
             abort=True)
-        _re_init(db_path)
+        _re_init(db_path, config_file_path)
 
 
 @app.command('a')
