@@ -112,7 +112,7 @@ python-versions = "*"
 
 [[package]]
 name = "logging-utils-tddschn"
-version = "0.1.5"
+version = "0.1.7"
 description = "Logging utilities for personal use."
 category = "main"
 optional = false
@@ -449,8 +449,8 @@ iniconfig = [
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
 ]
 logging-utils-tddschn = [
-    {file = "logging-utils-tddschn-0.1.5.tar.gz", hash = "sha256:0bea9d28a6b3976e37d13765a64e59da2c1663f42e8c22b098ef994e4c9d7a74"},
-    {file = "logging_utils_tddschn-0.1.5-py3-none-any.whl", hash = "sha256:cd5e9c4792087edcf04bd2e10fef1e2edbbe68df530a3ba4ee7df1eaa991f191"},
+    {file = "logging-utils-tddschn-0.1.7.tar.gz", hash = "sha256:26ad16b2ac2ee4f17d181e0ff26df2872d3f2bedace142ead83ccaae8d34800d"},
+    {file = "logging_utils_tddschn-0.1.7-py3-none-any.whl", hash = "sha256:158bcff7b6f3f26f8580b7ea56c0f8bd78ddf80c5592e6deab546ec30c030fe3"},
 ]
 packaging = [
     {file = "packaging-21.3-py3-none-any.whl", hash = "sha256:ef103e05f519cdc783ae24ea4e2e0f508a9c99b2d4969652eed6a2e1ea5bd522"},
