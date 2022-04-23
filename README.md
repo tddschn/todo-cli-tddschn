@@ -10,8 +10,8 @@ A simple command-line Todo app with typer and sqlite
 		- [todo](#todo)
 		- [todo config](#todo-config)
 		- [todo ls](#todo-ls)
+	- [SQLite database schema](#sqlite-database-schema)
 	- [Screenshots](#screenshots)
-		- [ls: list all to-dos, ordered by priority and due date.](#ls-list-all-to-dos-ordered-by-priority-and-due-date)
 
 ## Install
 
@@ -81,14 +81,24 @@ Usage: todo ls [OPTIONS] COMMAND [ARGS]...
   list all to-dos, ordered by priority and due date.
 
 Options:
-  --help  Show this message and exit.
+  -d, --description TEXT
+  -p, --priority [low|medium|high]
+  -s, --status [todo|done|deleted|cancelled|wip]
+  -pr, --project TEXT
+  -t, --tags TEXT
+  -dd, --due-date [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+  --help                          Show this message and exit.
 
 Commands:
   project  Filter to-dos by project.
   tag      Filter to-dos by tag.
 ```
+## SQLite database schema
+
+![schema](images/diagram.png)
 
 ## Screenshots
 
-### ls: list all to-dos, ordered by priority and due date.
+![screenshot](images/screenshot.png)
 
+![screenshot-2](images/screenshot-2.png)
