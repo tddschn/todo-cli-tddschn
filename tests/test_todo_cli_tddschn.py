@@ -33,7 +33,8 @@ class TestTodo:
         # cls.config_file_path = tempfile.mkstemp(suffix='.ini')[1]
         # cls.db_path = tempfile.mkstemp(suffix=".db")[1]
         cls.config_file_path = get_config_path()
-        if not _check_db_exists():
+        cls.db_path = get_database_path(Path(cls.config_file_path))
+        if _check_db_exists():
             cls.teardown_class()
         cls.db_path = get_database_path(Path(cls.config_file_path))
 
