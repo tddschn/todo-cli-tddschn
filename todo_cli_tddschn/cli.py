@@ -19,6 +19,19 @@ app = typer.Typer(name='todo')
 app.add_typer(config.app, name='config')
 
 
+def _check_db_exists() -> None:
+    db_path = get_database_path(config.CONFIG_FILE_PATH)
+    if not db_path.exists() or db_path.stat().st_size == 0:
+        typer.secho(
+            f'Database not initialized. Run `todo init` to initialize.',
+            fg=typer.colors.RED,
+            err=True)
+        raise typer.Abort()
+
+
+# _check_db_inited()
+
+
 def _version_callback(value: bool) -> None:
     if value:
         typer.echo(f"{__app_name__} v{__version__}")
@@ -135,6 +148,7 @@ def add(
 @app.command(name="ls")
 def list_all() -> None:
     """list all to-dos."""
+    # _check_db_inited() # not working
     with Session(engine) as session:
         todos = session.query(Todo).all()
         todo_list = [todo_to_dict_with_project_name(x) for x in todos]
@@ -284,6 +298,7 @@ def remove_all(
 
 @app.callback()
 def main(
+    ctx: typer.Context,
     version: bool = typer.Option(
         None,
         "--version",
@@ -299,7 +314,10 @@ def main(
     """
     tddschn's command line todo app
     """
-    return
+    # print(ctx.invoked_subcommand)
+    # raise typer.Abort()
+    if ctx.invoked_subcommand not in ['init', 're-init']:
+        _check_db_exists()
 
 
 if __name__ == '__main__':
