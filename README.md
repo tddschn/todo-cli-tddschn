@@ -164,3 +164,7 @@ If you're looking for an awesome CLI todo app, try [taskwarrior](https://taskwar
 ![screenshot](images/screenshot.png)
 
 ![screenshot-2](images/screenshot-2.png)
+
+![todo-serve](images/todo-serve.png)
+
+![api-docs](images/api-docs.png)
