@@ -3,15 +3,23 @@
 A simple command-line Todo app made with typer and sqlite
 
 - [todo-cli-tddschn](#todo-cli-tddschn)
+	- [Features](#features)
 	- [Install](#install)
 		- [pipx (recommended)](#pipx-recommended)
 		- [pip](#pip)
 	- [Usage](#usage)
 		- [todo](#todo)
-		- [todo config](#todo-config)
 		- [todo ls](#todo-ls)
+		- [todo config](#todo-config)
+		- [todo info](#todo-info)
+	- [Why do you made this?](#why-do-you-made-this)
 	- [SQLite database schema](#sqlite-database-schema)
 	- [Screenshots](#screenshots)
+
+## Features
+- Creating, reading, updating, and deleting todos;
+- Nicely formatting the outputs (with color);
+- `todo ls` lists all todos, ordered by priority and due date, the todos without a due date are put last (nullslast).
 
 ## Install
 
@@ -28,6 +36,9 @@ pip install todo-cli-tddschn
 ## Usage
 
 ### todo
+
+You can add, modify, or remove (all) todos with the `todo` command:
+
 ```
 todo --help
 
@@ -55,24 +66,11 @@ Commands:
   re-init  Re-initialize the to-do database.
   rm       Remove a to-do using its TODO_ID.
 ```
-### todo config
-```
-todo config --help
-
-Usage: todo config [OPTIONS] COMMAND [ARGS]...
-
-  Getting and managing the config
-
-Options:
-  --help  Show this message and exit.
-
-Commands:
-  db-path  Get the path to the to-do database.
-  edit     Edit the config file.
-  path     Get the path to the config file.
-```
 
 ### todo ls
+
+List and filter the todos.
+
 ```
 todo ls --help
 
@@ -93,6 +91,51 @@ Commands:
   project  Filter to-dos by project.
   tag      Filter to-dos by tag.
 ```
+
+### todo config
+
+Get or edit the configurations
+
+```
+todo config --help
+
+Usage: todo config [OPTIONS] COMMAND [ARGS]...
+
+  Getting and managing the config
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  db-path  Get the path to the to-do database.
+  edit     Edit the config file. # Opens in default editor
+  path     Get the path to the config file.
+```
+
+### todo info
+
+Get the info and stats about the todos.
+
+```
+todo info --help
+
+Usage: todo info [OPTIONS] COMMAND [ARGS]...
+
+  Get infos about todos
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  count  Get todo counts
+```
+
+
+## Why do you made this?
+
+For practicing my python and SQL skills.
+
+If you're looking for an awesome CLI todo app, try [taskwarrior](https://taskwarrior.org/).
 ## SQLite database schema
 
 ![schema](images/diagram.png)
