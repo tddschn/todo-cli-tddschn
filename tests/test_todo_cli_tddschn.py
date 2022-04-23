@@ -56,7 +56,8 @@ class TestTodo:
     @pytest.mark.parametrize('cmd', [([
         'finish', 'cooking', 'eva', '-dd', '2121-12-11', '-pr', 'eva', '-s',
         'wip'
-    ]), (['eat', 'eva', '-p', 'high', '-t', 'lol', '-t', 'dinner'])])
+    ]), (['eat', 'eva', '-p', 'high', '-t', 'lol', '-t', 'dinner']),
+                                     (['test'])])
     def test_add(self, cmd):
         result = self.runner.invoke(app, ['a', *cmd])
         assert result.exit_code == 0
@@ -79,6 +80,23 @@ class TestTodo:
         result = self.runner.invoke(app, ['ls'])
         assert result.exit_code == 0
         print(result.output, file=sys.stderr)
+
+    def test_remove(self):
+        result = self.runner.invoke(app, ['rm', '1'])
+        assert result.exit_code == 1
+
+    def test_remove2(self):
+        result = self.runner.invoke(app, ['rm', '1'], input='y\n')
+        assert result.exit_code == 0
+
+    def test_list3(self):
+        result = self.runner.invoke(app, ['ls'])
+        assert result.exit_code == 0
+        print(result.output, file=sys.stderr)
+
+    def test_clear(self):
+        result = self.runner.invoke(app, ['clear'], input='y\n')
+        assert result.exit_code == 0
 
     def test_re_init(self):
         # result = self.runner.invoke(app, [
