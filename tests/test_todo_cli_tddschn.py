@@ -3,7 +3,7 @@ from pathlib import Path
 import sys
 import tempfile
 from todo_cli_tddschn import __version__, __app_name__
-from todo_cli_tddschn.cli import app
+from todo_cli_tddschn.cli import app, _check_db_exists
 from todo_cli_tddschn.config import get_config_path, get_database_path
 
 from typer.testing import CliRunner
@@ -33,6 +33,8 @@ class TestTodo:
         # cls.config_file_path = tempfile.mkstemp(suffix='.ini')[1]
         # cls.db_path = tempfile.mkstemp(suffix=".db")[1]
         cls.config_file_path = get_config_path()
+        if not _check_db_exists():
+            cls.teardown_class()
         cls.db_path = get_database_path(Path(cls.config_file_path))
 
     @classmethod
@@ -97,6 +99,11 @@ class TestTodo:
     def test_clear(self):
         result = self.runner.invoke(app, ['clear'], input='y\n')
         assert result.exit_code == 0
+
+    def test_info_count(self):
+        result = self.runner.invoke(app, ['info', 'count'])
+        assert result.exit_code == 0
+        assert "Total todos: 0" in result.output
 
     def test_re_init(self):
         # result = self.runner.invoke(app, [

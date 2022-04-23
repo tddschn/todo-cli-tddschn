@@ -3,7 +3,7 @@
 from datetime import datetime
 from pathlib import Path
 import typer
-from . import __app_name__, __version__, config, list_command, Status, Priority
+from . import __app_name__, __version__, config, list_command, info_command, Status, Priority
 from . import logger, _DEBUG
 from .config import DEFAULT_DB_FILE_PATH, get_database_path
 from sqlmodel import Session, delete
@@ -18,11 +18,18 @@ from tabulate import tabulate
 app = typer.Typer(name='todo')
 app.add_typer(config.app, name='config')
 app.add_typer(list_command.app, name='ls')
+app.add_typer(info_command.app, name='info')
 
 
-def _check_db_exists() -> None:
+def _check_db_exists() -> bool:
     db_path = get_database_path(config.CONFIG_FILE_PATH)
     if not db_path.exists() or db_path.stat().st_size == 0:
+        return False
+    return True
+
+
+def _check_db_exists_typer() -> None:
+    if not _check_db_exists():
         typer.secho(
             f'Database not initialized. Run `todo init` to initialize.',
             fg=typer.colors.RED,
@@ -300,7 +307,7 @@ def main(
     # print(ctx.invoked_subcommand)
     # raise typer.Abort()
     if ctx.invoked_subcommand not in ['init', 're-init']:
-        _check_db_exists()
+        _check_db_exists_typer()
 
 
 if __name__ == '__main__':
