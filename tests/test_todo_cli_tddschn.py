@@ -1,13 +1,28 @@
 import os
 from pathlib import Path
+import sys
 import tempfile
 from todo_cli_tddschn import __version__, __app_name__
 from todo_cli_tddschn.cli import app
 from todo_cli_tddschn.config import get_config_path, get_database_path
 
 from typer.testing import CliRunner
+import pytest
 
 # runner = CliRunner()
+
+
+def with_func(func):
+
+    def with_list(method):
+
+        def wrapper(self, *args, **kwargs):
+            method(self, *args, **kwargs)
+            func(self)
+
+        return wrapper
+
+    return with_list
 
 
 class TestTodo:
@@ -38,17 +53,32 @@ class TestTodo:
         assert result.exit_code == 0
         assert "Database created successfully" in result.output
 
-    def test_add(self):
-        result = self.runner.invoke(
-            app, ['a', 'test', '--priority', 'low', '--project', 'test'])
+    @pytest.mark.parametrize('cmd', [([
+        'finish', 'cooking', 'eva', '-dd', '2121-12-11', '-pr', 'eva', '-s',
+        'wip'
+    ]), (['eat', 'eva', '-p', 'high', '-t', 'lol', '-t', 'dinner'])])
+    def test_add(self, cmd):
+        result = self.runner.invoke(app, ['a', *cmd])
         assert result.exit_code == 0
         # assert "Added to-do successfully" in result.output
 
+    def test_list(self):
+        result = self.runner.invoke(app, ['ls'])
+        assert result.exit_code == 0
+        print(result.output, file=sys.stderr)
+        # assert "Added to-do successfully" in result.output
+
+    # @with_func(self.test_list)
     def test_modify(self):
         result = self.runner.invoke(
             app, ['m', '1', '-d', 'test modified', '--priority', 'high'])
         assert result.exit_code == 0
         # assert "Added to-do successfully" in result.output
+
+    def test_list2(self):
+        result = self.runner.invoke(app, ['ls'])
+        assert result.exit_code == 0
+        print(result.output, file=sys.stderr)
 
     def test_re_init(self):
         # result = self.runner.invoke(app, [
