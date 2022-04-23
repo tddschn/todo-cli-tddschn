@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
 from datetime import datetime
-from logging import getLogger
 from pathlib import Path
 import typer
 from . import __app_name__, __version__, config, Status, Priority
-from . import get_logger
+from . import logger, _DEBUG
 from .config import DEFAULT_DB_FILE_PATH, get_database_path
 from sqlmodel import Session, delete
 from .database import create_db_and_tables, engine, get_project_with_name
@@ -13,8 +12,8 @@ from .models import Project, Todo, ProjectCreate, ProjectRead, TodoCreate, TodoR
 from .utils import merge_desc, serialize_tags, deserialize_tags, todo_to_dict_with_project_name
 from tabulate import tabulate
 
-logger = None
-_DEBUG = None
+# logger = None
+# _DEBUG = None
 
 app = typer.Typer(name='todo')
 app.add_typer(config.app, name='config')
@@ -26,11 +25,10 @@ def _version_callback(value: bool) -> None:
         raise typer.Exit()
 
 
-def _verbose_callback(value: bool) -> None:
-    global logger
-    global _DEBUG
-    logger, _DEBUG = get_logger(do_log=value)
-
+# def _verbose_callback(value: bool) -> None:
+#     global logger
+#     global _DEBUG
+#     logger, _DEBUG = get_logger(do_log=value)
 
 init_db_path_opt = typer.Option(
     DEFAULT_DB_FILE_PATH,
@@ -294,9 +292,9 @@ def main(
         callback=_version_callback,
         is_eager=True,
     ),
-    verbose: bool = typer.Option(False,
-                                 help='Show verbose output.',
-                                 callback=_verbose_callback),
+    # verbose: bool = typer.Option(False,
+    #                              help='Show verbose output.',
+    #                              callback=_verbose_callback),
 ) -> None:
     """
     tddschn's command line todo app

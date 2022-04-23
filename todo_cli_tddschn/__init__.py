@@ -4,21 +4,16 @@ __app_name_full__ = 'todo-cli-tddschn'
 
 from dataclasses import dataclass
 from enum import Enum
-from logging import Logger
+from typing import Any
 
-
-def get_logger(do_log: bool = False) -> tuple[Logger, bool]:
-    try:
-        from logging_utils_tddschn import get_logger
-        logger, _DEBUG = get_logger(__app_name__, do_log=do_log)
-        return logger, bool(_DEBUG)
-    except:
-        import logging
-        from logging import NullHandler
-        logger = logging.getLogger(__app_name__)
-        if not do_log:
-            logger.addHandler(NullHandler())
-        return logger, do_log
+try:
+    from logging_utils_tddschn import get_logger
+    logger, _DEBUG = get_logger(__app_name__)
+except:
+    import logging
+    from logging import NullHandler
+    logger = logging.getLogger(__app_name__)
+    logger.addHandler(NullHandler())
 
 
 class Priority(str, Enum):
