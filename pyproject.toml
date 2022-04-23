@@ -15,6 +15,7 @@ shellingham = "1.4.0"
 tabulate = "^0.8.9"
 logging-utils-tddschn = "^0.1.5"
 sqlmodel = "^0.0.6"
+fastapi = "^0.75.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.1"
