@@ -1,81 +1,9 @@
-from typing import List, Optional
+#!/usr/bin/env python3
 
 from fastapi import Depends, FastAPI, HTTPException, Query
 from sqlmodel import Field, Relationship, Session, SQLModel, create_engine, select
-from .models import Project, Todo, ProjectCreate, ProjectRead, TodoCreate, TodoRead
-
-
-class ProjectBase(SQLModel):
-    name: str = Field(index=True)
-    headquarters: str
-
-
-class Project(ProjectBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-
-    todos: List["Todo"] = Relationship(back_populates="project")
-
-
-class ProjectCreate(ProjectBase):
-    pass
-
-
-class ProjectRead(ProjectBase):
-    id: int
-
-
-class ProjectUpdate(SQLModel):
-    id: Optional[int] = None
-    name: Optional[str] = None
-    headquarters: Optional[str] = None
-
-
-class TodoBase(SQLModel):
-    name: str = Field(index=True)
-    secret_name: str
-    age: Optional[int] = Field(default=None, index=True)
-
-    project_id: Optional[int] = Field(default=None, foreign_key="project.id")
-
-
-class Todo(TodoBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-
-    project: Optional[Project] = Relationship(back_populates="todos")
-
-
-class TodoRead(TodoBase):
-    id: int
-
-
-class TodoCreate(TodoBase):
-    pass
-
-
-class TodoUpdate(SQLModel):
-    name: Optional[str] = None
-    secret_name: Optional[str] = None
-    age: Optional[int] = None
-    project_id: Optional[int] = None
-
-
-class TodoReadWithProject(TodoRead):
-    project: Optional[ProjectRead] = None
-
-
-class ProjectReadWithTodoes(ProjectRead):
-    todos: List[TodoRead] = []
-
-
-sqlite_file_name = "database.db"
-sqlite_url = f"sqlite:///{sqlite_file_name}"
-
-connect_args = {"check_same_thread": False}
-engine = create_engine(sqlite_url, echo=True, connect_args=connect_args)
-
-
-def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
+from .models import Project, Todo, ProjectCreate, ProjectRead, TodoCreate, TodoRead, ProjectUpdate, TodoUpdate, ProjectReadWithTodos, TodoReadWithProject
+from .database import engine
 
 
 def get_session():
@@ -85,10 +13,9 @@ def get_session():
 
 app = FastAPI()
 
-
-@app.on_event("startup")
-def on_startup():
-    create_db_and_tables()
+# @app.on_event("startup")
+# def on_startup():
+#     create_db_and_tables()
 
 
 @app.post("/todos/", response_model=TodoRead)
@@ -100,7 +27,7 @@ def create_todo(*, session: Session = Depends(get_session), todo: TodoCreate):
     return db_todo
 
 
-@app.get("/todos/", response_model=List[TodoRead])
+@app.get("/todos/", response_model=list[TodoRead])
 def read_todos(
         *,
         session: Session = Depends(get_session),
@@ -158,7 +85,7 @@ def create_project(*,
     return db_project
 
 
-@app.get("/projects/", response_model=List[ProjectRead])
+@app.get("/projects/", response_model=list[ProjectRead])
 def read_projects(
         *,
         session: Session = Depends(get_session),
@@ -169,7 +96,7 @@ def read_projects(
     return projects
 
 
-@app.get("/projects/{project_id}", response_model=ProjectReadWithTodoes)
+@app.get("/projects/{project_id}", response_model=ProjectReadWithTodos)
 def read_project(*, project_id: int, session: Session = Depends(get_session)):
     project = session.get(Project, project_id)
     if not project:

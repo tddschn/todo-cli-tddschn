@@ -17,6 +17,15 @@ class Todo(TodoBase, table=True):
     project: Optional['Project'] = Relationship(back_populates='todos')
 
 
+class TodoUpdate(SQLModel):
+    description: Optional[str] = None
+    priority: Optional[str] = None
+    status: Optional[str] = None
+    tags: list[str] | None = None
+    due_date: datetime | None = None
+    project_id: Optional[int] = None
+
+
 class TodoCreate(TodoBase):
     pass
 
@@ -40,3 +49,15 @@ class ProjectCreate(ProjectBase):
 
 class ProjectRead(ProjectBase):
     id: int
+
+
+class ProjectUpdate(SQLModel):
+    name: Optional[str] = None
+
+
+class TodoReadWithProject(TodoRead):
+    project: Optional[ProjectRead] = None
+
+
+class ProjectReadWithTodos(ProjectRead):
+    todos: list[TodoRead] = []
