@@ -53,3 +53,14 @@ def filter_by_tags(tag: str):
         todos = session.exec(
             select(Todo).where(col(Todo.tags).like(f"%{tag}%"))).all()
     _list_todos(todos)
+
+
+@app.command('project')
+def filter_by_project(project_name: str):
+    """Filter to-dos by project."""
+    with Session(engine) as session:
+        todos = session.exec(
+            select(Todo).where(
+                col(Todo.project_id) == get_project_with_name(
+                    project_name).id)).all()
+    _list_todos(todos)
