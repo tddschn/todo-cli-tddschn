@@ -56,7 +56,8 @@ def re_init(
                                "-f",
                                help="Force re-initialization"),
 ) -> None:
-    """Re-initialize the to-do database."""
+    """Re-initialize the to-do database.
+    This will delete the current database and create a new one."""
 
     def _re_init(db_path: Path, config_file_path):
         # delete the old database
@@ -262,6 +263,9 @@ def remove_all(
 ) -> None:
     """Remove all to-dos."""
     with Session(engine) as session:
+        if not force:
+            typer.confirm(f'Are you sure you want to delete all to-dos?',
+                          abort=True)
         statement = delete(Todo)
         result = session.exec(statement)  # type: ignore
         session.commit()

@@ -13,6 +13,7 @@ class TestTodo:
     @classmethod
     def setup_class(cls):
         cls.runner = CliRunner()
+        cls.config_file_path = tempfile.mkstemp(suffix='.ini')[1]
         cls.db_path = tempfile.mkstemp(suffix=".db")[1]
 
     @classmethod
@@ -25,13 +26,18 @@ class TestTodo:
         assert f"{__app_name__} v{__version__}\n" == result.output
 
     def test_init(self):
-        result = self.runner.invoke(app, ["init", "--db-path", self.db_path])
+        result = self.runner.invoke(app, [
+            "init", "--db-path", self.db_path, '--config-file-path',
+            self.config_file_path
+        ])
         assert result.exit_code == 0
         assert "Database created successfully" in result.output
 
     def test_re_init(self):
-        result = self.runner.invoke(app,
-                                    ['re-init', '--db-path', self.db_path],
+        result = self.runner.invoke(app, [
+            're-init', '--db-path', self.db_path, '--config-file-path',
+            self.config_file_path
+        ],
                                     input='y\n')
         assert result.exit_code == 0
         assert "Database created successfully" in result.output
