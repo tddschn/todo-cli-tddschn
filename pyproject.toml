@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "todo-cli-tddschn"
-version = "0.2.4"
+version = "0.2.5"
 description = "CLI Todo app with typer and sqlite"
 authors = ["Xinyuan Chen <45612704+tddschn@users.noreply.github.com>"]
 
