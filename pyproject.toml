@@ -3,6 +3,7 @@ name = "todo-cli-tddschn"
 version = "0.2.11"
 description = "CLI Todo app made with typer and sqlite"
 authors = ["Xinyuan Chen <45612704+tddschn@users.noreply.github.com>"]
+readme = "README.md"
 
 [tool.poetry.scripts]
 todo = "todo_cli_tddschn.cli:app"
