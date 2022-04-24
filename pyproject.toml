@@ -4,7 +4,12 @@ version = "0.2.12"
 description = "CLI Todo app made with typer and sqlite"
 authors = ["Xinyuan Chen <45612704+tddschn@users.noreply.github.com>"]
 readme = "README.md"
+homepage = "https://github.com/tddschn/todo-cli-tddschn"
+repository = "https://github.com/tddschn/todo-cli-tddschn"
+keywords = ["todo", "cli", "sqlite", "typer", "fastapi", "rest"]
 
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/tddschn/todo-cli-tddschn/issues"
 [tool.poetry.scripts]
 todo = "todo_cli_tddschn.cli:app"
 
