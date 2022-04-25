@@ -1,6 +1,6 @@
 # todo-cli-tddschn
 
-A simple command-line Todo app made with typer, sqlite and REST API.
+A simple command-line Todo app made with typer, sqlite and a REST API.
 
 - [todo-cli-tddschn](#todo-cli-tddschn)
 	- [Features](#features)
