@@ -3,6 +3,7 @@ name = "todo-cli-tddschn"
 version = "0.2.15"
 description = "CLI Todo app made with typer, sqlite and a REST API"
 authors = ["Xinyuan Chen <45612704+tddschn@users.noreply.github.com>"]
+license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/tddschn/todo-cli-tddschn"
 repository = "https://github.com/tddschn/todo-cli-tddschn"

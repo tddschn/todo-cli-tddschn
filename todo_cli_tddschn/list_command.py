@@ -13,16 +13,6 @@ from tabulate import tabulate
 app = typer.Typer(name='ls')
 
 
-# @app.command(name="list")
-# @app.command(name="ls")
-def list_all() -> None:
-    """list all to-dos."""
-    # _check_db_inited() # not working
-    with Session(engine) as session:
-        todos = session.query(Todo).all()
-    _list_todos(todos)
-
-
 def _list_todos(todos: list[Todo], filtered: bool = False):
     todo_list = [todo_to_dict_with_project_name(x) for x in todos]
     if filtered:
