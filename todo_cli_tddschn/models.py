@@ -9,6 +9,7 @@ class TodoBase(SQLModel):
     status: str = Field(default='todo')
     tags: str | None
     due_date: datetime | None
+    date_added: datetime | None
     project_id: Optional[int] = Field(default=None, foreign_key="project.id")
 
 
@@ -23,6 +24,7 @@ class TodoUpdate(SQLModel):
     status: Optional[str] = None
     tags: list[str] | None = None
     due_date: datetime | None = None
+    date_added: datetime | None = None
     project_id: Optional[int] = None
 
 
