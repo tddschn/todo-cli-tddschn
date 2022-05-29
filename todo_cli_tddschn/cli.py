@@ -31,7 +31,11 @@ from .utils import (
 # logger = None
 # _DEBUG = None
 
-app = typer.Typer(name=__app_name__)
+app = typer.Typer(
+    context_settings=dict(max_content_width=85),
+    name=__app_name__,
+    epilog='Created by Xinyuan Chen || Homepage: https://github.com/tddschn/todo-cli-tddschn',
+)
 app.add_typer(config.app, name='config')
 app.add_typer(list_commands.app, name='ls')
 app.add_typer(info_commands.app, name='info')

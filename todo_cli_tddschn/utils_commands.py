@@ -8,18 +8,21 @@ from .models import Project, Todo
 import typer
 from tabulate import tabulate
 from . import __app_name__
-from .utils import export_todo_command
+from .utils import export_todo_to_todo_command
 
 app = typer.Typer(name='utils')
 
 
 @app.command('export')
 def export_todos():
-    """Export todos to todo commands that can be used to restore your todo database"""
+    """Export todos to todo commands that can be used to restore your todo database,
+    Only guaranteed to work in POSIX compliant shells."""
     # get all todo ids
     with Session(engine) as session:
         todo_ids: list[int] = [todo.id for todo in session.query(Todo).all()]
-    export_commands = '\n'.join(export_todo_command(todo_id) for todo_id in todo_ids)
+    export_commands = '\n'.join(
+        export_todo_to_todo_command(todo_id) for todo_id in todo_ids
+    )
     typer.secho(export_commands)
 
 
@@ -42,3 +45,8 @@ def fill_column():
         session.exec("UPDATE todo SET date_added = datetime('now') WHERE date_added IS NULL")  # type: ignore
         session.commit()
         typer.secho("Done")
+
+
+@app.callback()
+def main():
+    """Utility functions"""

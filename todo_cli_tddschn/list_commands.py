@@ -79,6 +79,9 @@ def order_by_priority_then_due_date(
         "--date-added-after",
         "-daa",
     ),
+    full_date_added: bool = typer.Option(
+        False, "--full-date-added", "-fda", help='Include time in the date_added column'
+    ),
 ):
     """list all to-dos, ordered by priority and due date."""
     whens = {'low': 0, 'medium': 1, 'high': 2}
@@ -111,7 +114,7 @@ def order_by_priority_then_due_date(
             .order_by(sort_logic.desc(), nullslast(Todo.due_date))
             .all()
         )
-    _list_todos(todos, filtered=bool(wheres))
+    _list_todos(todos, filtered=bool(wheres), date_added_full=full_date_added)
 
 
 @app.command('tag')

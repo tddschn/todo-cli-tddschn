@@ -26,21 +26,15 @@ def deserialize_tags(tags_s: str) -> list[str]:
     return json.loads(tags_s)
 
 
-# def serialize_todo(todo: TodoItem) -> dict:
-#     return {
-#         'id': todo.id,
-#         'description': todo.description,
-#         'priority': todo.priority.value,
-#         'status': todo.status.value,
-#         'project': todo.project,
-#         'tags': todo.tags,
-#         'due_date': todo.due_date,
-#     }
+def str_self_or_empty(s) -> str:
+    if s is None:
+        return ''
+    return str(s)
 
 
 def todo_to_dict_with_project_name(
     todo: Todo, date_added_full_date: bool = False
-) -> dict:
+) -> dict[str, str]:
     d = todo.__dict__
     d.pop('_sa_instance_state', None)
     # from icecream import ic
@@ -90,8 +84,9 @@ def _get_todo(
     return todo
 
 
-def export_todo_command(todo_id: int) -> str:
-    """Export the todo command that can be used to re-construct to todo"""
+def export_todo_to_todo_command(todo_id: int) -> str:
+    """Export the todo command that can be used to re-construct to todo,
+    Only guaranteed to work in POSIX compliant shells."""
     import shlex
 
     with Session(engine) as session:
@@ -101,17 +96,19 @@ def export_todo_command(todo_id: int) -> str:
         __app_name__,
         'a',
         todo.description,
-        '-p',
+        '--priority',
         todo.priority,
-        '-s',
+        '--status',
         todo.status,
-        '-pr',
-        todo_project,
-        '-t',
-        todo.tags,
-        '-dd',
-        todo.due_date,
-        '-da',
-        todo.date_added,
+        '--due-date',
+        str_self_or_empty(todo.due_date),
+        '--date-added',
+        str_self_or_empty(todo.date_added),
     ]
+    if todo_project:
+        cmd.extend(['--project', todo_project])
+    if todo.tags:
+        tags: list[str] = json.loads(todo.tags)
+        for tag in tags:
+            cmd.extend(['-t', tag])
     return shlex.join(cmd)
