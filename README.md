@@ -208,6 +208,9 @@ Here's the how:
   git clone https://github.com/tddschn/todo-cli-tddschn.git
   cd todo-cli-tddschn
 
+  # edit alembic.ini, change the sqlalchemy.url to your database url
+  vim alembic.ini
+
   # migrate to new db schema
   python -m alembic revision --autogenerate -m "Initial Migration"
   python -m alembic upgrade head
