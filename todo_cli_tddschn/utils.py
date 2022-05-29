@@ -12,7 +12,11 @@ def merge_desc(desc_l: list[str]) -> str:
     return ' '.join(desc_l)
 
 
-def format_datetime(d: datetime, full: bool = False) -> str:
+def format_datetime(
+    d: datetime, full: bool = False, date_format: str | None = None
+) -> str:
+    if date_format is not None:
+        return d.strftime(date_format)
     if full:
         return d.strftime('%Y-%m-%d %H:%M:%S')
     return d.strftime('%Y-%m-%d')
