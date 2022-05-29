@@ -238,7 +238,7 @@ def modify(
         "-pr",
     ),
     tags: list[str] = typer.Option(
-        None,
+        None,  # defaults to [], not None
         "--tags",
         "-t",
     ),
