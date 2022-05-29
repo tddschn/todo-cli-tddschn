@@ -268,7 +268,7 @@ def modify(
             if project is not None
             else todo.project_id
         )
-        todo.tags = serialize_tags(tags) if tags is not None else todo.tags
+        todo.tags = serialize_tags(tags) if tags else todo.tags
         todo.due_date = due_date if due_date is not None else todo.due_date
         todo.date_added = date_added if date_added is not None else todo.date_added
         session.add(todo)
