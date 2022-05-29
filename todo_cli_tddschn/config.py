@@ -47,13 +47,25 @@ def init_app(db_path: Path, config_file_path: Path = CONFIG_FILE_PATH):
         raise typer.Exit(1)
 
 
-def get_database_path(config_file: Path) -> Path:
-    """Read and returns the current path to the to-do database
-    from the config file."""
+def read_config(config_file: Path) -> configparser.ConfigParser:
     logger.info(f"Reading database path from {config_file}")
     config_parser = configparser.ConfigParser()
     config_parser.read(config_file)
+    return config_parser
+
+
+def get_database_path(config_file: Path) -> Path:
+    """Read and returns the current path to the to-do database
+    from the config file."""
+    config_parser = read_config(config_file)
     return Path(config_parser["General"]["database"])
+
+
+def get_format(config_file: Path) -> configparser.SectionProxy:
+    """Get format specs from the config file."""
+    config_parser = read_config(config_file)
+    format_specs = config_parser["Format"]
+    return format_specs
 
 
 @app.command('path')

@@ -1,3 +1,4 @@
+from configparser import SectionProxy
 from datetime import datetime
 import json
 from sqlmodel import Session, select
@@ -37,7 +38,9 @@ def str_self_or_empty(s) -> str:
 
 
 def todo_to_dict_with_project_name(
-    todo: Todo, date_added_full_date: bool = False
+    todo: Todo,
+    date_added_full_date: bool = False,
+    format_specs: SectionProxy | None = None,
 ) -> dict[str, str]:
     d = todo.__dict__
     d.pop('_sa_instance_state', None)
@@ -61,10 +64,26 @@ def todo_to_dict_with_project_name(
         d_ordered['project'] = None
 
     # 3
-    d_ordered |= {k: d[k] for k in attr_list_2}
+    # d_ordered |= {k: d[k] for k in attr_list_2}
+    # tags
+    d_ordered['tags'] = ', '.join(deserialize_tags(d['tags']))
+    # due_date
+    # typer.secho(type(todo.due_date))
+    if todo.due_date is not None:
+        d_ordered['due_date'] = format_datetime(
+            todo.due_date,
+            full=date_added_full_date,
+            date_format=format_specs['due_date'] if format_specs else None,
+        )
 
     # 4
-    d_ordered |= {'date_added': format_datetime(d['date_added'], date_added_full_date)}
+    # d_ordered |= {'date_added': format_datetime(d['date_added'], date_added_full_date)}
+    if todo.date_added is not None:
+        d_ordered['date_added'] = format_datetime(
+            todo.date_added,
+            full=date_added_full_date,
+            date_format=format_specs['date_added'] if format_specs else None,
+        )
 
     return d_ordered
 
