@@ -21,3 +21,15 @@ def export_todos():
         todo_ids: list[int] = [todo.id for todo in session.query(Todo).all()]
     export_commands = '\n'.join(export_todo_command(todo_id) for todo_id in todo_ids)
     typer.secho(export_commands)
+
+
+# using alembic instead
+# https://github.com/tiangolo/sqlmodel/issues/85#issuecomment-917228849=
+
+# @app.command('db-add-date-added-column')
+# def add_date_added_column():
+#     """Add date_added column to todos table"""
+#     with Session(engine) as session:
+#         session.exec("ALTER TABLE todos ADD COLUMN date_added DATETIME")
+#         session.commit()
+#         typer.secho("Done")
