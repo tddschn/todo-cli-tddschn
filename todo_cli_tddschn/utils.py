@@ -102,9 +102,9 @@ def export_todo_to_todo_command(todo_id: int) -> str:
         todo.status,
         '--due-date',
         str_self_or_empty(todo.due_date),
-        '--date-added',
-        str_self_or_empty(todo.date_added),
     ]
+    if hasattr(todo, 'date_added'):
+        cmd.extend(['--date-added', str_self_or_empty(todo.date_added)])
     if todo_project:
         cmd.extend(['--project', todo_project])
     if todo.tags:
