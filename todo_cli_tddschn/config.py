@@ -12,26 +12,38 @@ DEFAULT_DB_FILE_PATH = Path.home() / '.todo-cli-tddschn.db'
 CONFIG_DIR_PATH = Path(typer.get_app_dir(__app_name__))
 CONFIG_FILE_PATH = CONFIG_DIR_PATH / "config.ini"
 
+DEFAULT_DUE_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
+DEFAULT_DATE_ADDED_FORMAT = '%Y-%m-%d'
 app = typer.Typer(name='config')
+
+
+def create_default_config_object() -> configparser.ConfigParser:
+    """Create a default config object."""
+    config_parser = configparser.ConfigParser()
+    config_parser["General"] = {"database": str(DEFAULT_DB_FILE_PATH)}
+    config_parser["Format"] = {
+        'due_date': DEFAULT_DUE_DATE_FORMAT,
+        'date_added': DEFAULT_DATE_ADDED_FORMAT,
+    }
+    return config_parser
 
 
 def init_app(db_path: Path, config_file_path: Path = CONFIG_FILE_PATH):
     """Initialize the application.
     get the config file,
     and add db_path to the config file"""
-    config_parser = configparser.ConfigParser()
-    config_parser["General"] = {"database": str(db_path)}
+    config_parser = create_default_config_object()
     try:
         config_file_path.parent.mkdir(exist_ok=True)
         config_file_path.touch(exist_ok=True)
         with CONFIG_FILE_PATH.open("w") as file:
             config_parser.write(file)
-        typer.secho(f"Config file created at {config_file_path}",
-                    fg=typer.colors.GREEN)
+        typer.secho(f"Config file created at {config_file_path}", fg=typer.colors.GREEN)
     except:
         # raise TodoInitError(f'Creating config file {config_file_path} failed')
-        typer.secho(f'Creating config file {config_file_path} failed',
-                    fg=typer.colors.RED)
+        typer.secho(
+            f'Creating config file {config_file_path} failed', fg=typer.colors.RED
+        )
         raise typer.Exit(1)
 
 
