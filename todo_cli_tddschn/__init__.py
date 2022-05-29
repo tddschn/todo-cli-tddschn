@@ -1,4 +1,4 @@
-__version__ = '0.3.0'
+__version__ = '1.0.0'
 __app_name__ = 'todo'
 __app_name_full__ = 'todo-cli-tddschn'
 
