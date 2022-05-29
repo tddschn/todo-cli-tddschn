@@ -8,10 +8,10 @@ from . import (
     __version__,
     __app_name_full__,
     config,
-    list_command,
-    info_command,
     Status,
     Priority,
+    info_commands,
+    list_commands,
 )
 from . import logger, _DEBUG
 from .config import DEFAULT_DB_FILE_PATH, get_database_path
@@ -23,16 +23,17 @@ from .utils import (
     serialize_tags,
     deserialize_tags,
     todo_to_dict_with_project_name,
+    _get_todo,
 )
-from tabulate import tabulate
 
 # logger = None
 # _DEBUG = None
 
-app = typer.Typer(name='todo')
+app = typer.Typer(name=__app_name__)
 app.add_typer(config.app, name='config')
-app.add_typer(list_command.app, name='ls')
-app.add_typer(info_command.app, name='info')
+app.add_typer(list_commands.app, name='ls')
+app.add_typer(info_commands.app, name='info')
+app.add_typer(info_commands.app, name='info')
 
 
 def _check_db_exists() -> bool:
@@ -204,20 +205,6 @@ def get_todo(
     """Get a to-do by ID."""
     with Session(engine) as session:
         _get_todo(todo_id, session, True, date_added_full)
-
-
-def _get_todo(
-    todo_id, session, output: bool = False, date_added_full: bool = False
-) -> Todo:
-    todo = session.get(Todo, todo_id)
-    if todo is None:
-        typer.secho(f'No to-do with id {todo_id}', fg=typer.colors.RED, err=True)
-        raise typer.Exit()
-    if output:
-        todo_list = [todo_to_dict_with_project_name(todo, date_added_full)]
-        table = tabulate(todo_list, headers='keys')
-        typer.secho(table)
-    return todo
 
 
 # @app.command(name='s')

@@ -4,8 +4,9 @@ from sqlmodel import Session, select
 from .database import engine
 from .models import Project, Todo
 import typer
+from tabulate import tabulate
+from . import __app_name__
 
-app = typer.Typer(name='utils')
 
 
 def merge_desc(desc_l: list[str]) -> str:
@@ -16,6 +17,14 @@ def format_datetime(d: datetime, full: bool = False) -> str:
     if full:
         return d.strftime('%Y-%m-%d %H:%M:%S')
     return d.strftime('%Y-%m-%d')
+
+
+def serialize_tags(tags: list[str]) -> str:
+    return json.dumps(tags)
+
+
+def deserialize_tags(tags_s: str) -> list[str]:
+    return json.loads(tags_s)
 
 
 # def serialize_todo(todo: TodoItem) -> dict:
@@ -63,9 +72,42 @@ def todo_to_dict_with_project_name(
     return d_ordered
 
 
-def serialize_tags(tags: list[str]) -> str:
-    return json.dumps(tags)
+def _get_todo(
+    todo_id, session: Session, output: bool = False, date_added_full: bool = False
+) -> Todo:
+    todo = session.get(Todo, todo_id)
+    if todo is None:
+        typer.secho(f'No to-do with id {todo_id}', fg=typer.colors.RED, err=True)
+        raise typer.Exit()
+    if output:
+        todo_list = [todo_to_dict_with_project_name(todo, date_added_full)]
+        table = tabulate(todo_list, headers='keys')
+        typer.secho(table)
+    return todo
 
 
-def deserialize_tags(tags_s: str) -> list[str]:
-    return json.loads(tags_s)
+def export_todo_command(todo_id: int) -> str:
+    """Export the todo command that can be used to re-construct to todo"""
+    import shlex
+
+    with Session(engine) as session:
+        todo = _get_todo(todo_id, session)
+    todo_project = todo_to_dict_with_project_name(todo)['project']
+    cmd = [
+        __app_name__,
+        'a',
+        todo.description,
+        '-p',
+        todo.priority,
+        '-s',
+        todo.status,
+        '-pr',
+        todo_project,
+        '-t',
+        todo.tags,
+        '-dd',
+        todo.due_date,
+        '-da',
+        todo.date_added,
+    ]
+    return shlex.join(cmd)
