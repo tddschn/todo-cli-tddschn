@@ -32,7 +32,10 @@ A simple command-line Todo app made with typer, sqlite and a REST API.
 pipx install todo-cli-tddschn
 ```
 
-### pip
+About [`pipx`](https://pypa.github.io/pipx)
+
+
+### [pip](https://pypi.org/project/todo-cli-tddschn)
 ```
 pip install todo-cli-tddschn
 ```
