@@ -44,6 +44,7 @@ app.add_typer(utils_commands.app, name='utils')
 
 def _check_db_exists() -> bool:
     db_path = get_database_path(config.CONFIG_FILE_PATH)
+    logger.info(f'db_path: {db_path}')
     if not db_path.exists() or db_path.stat().st_size == 0:
         return False
     return True

@@ -12,10 +12,11 @@ DEFAULT_DB_FILE_PATH = Path.home() / '.todo-cli-tddschn.db'
 CONFIG_DIR_PATH = Path(typer.get_app_dir(__app_name__))
 CONFIG_FILE_PATH = CONFIG_DIR_PATH / "config.ini"
 
-# DEFAULT_DUE_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
-DEFAULT_DUE_DATE_FORMAT = '%m-%d'
-# DEFAULT_DATE_ADDED_FORMAT = '%Y-%m-%d'
-DEFAULT_DATE_ADDED_FORMAT = '%m-%d'
+# escape % in ini
+# DEFAULT_DUE_DATE_FORMAT = '%%Y-%%m-%%d %%H:%%M:%%S'
+DEFAULT_DUE_DATE_FORMAT = '%%m-%%d'
+# DEFAULT_DATE_ADDED_FORMAT = '%%Y-%%m-%%d'
+DEFAULT_DATE_ADDED_FORMAT = '%%m-%%d'
 DEFAULT_FORMAT_SPEC = {
     'due_date': DEFAULT_DUE_DATE_FORMAT,
     'date_added': DEFAULT_DATE_ADDED_FORMAT,
@@ -26,7 +27,7 @@ app = typer.Typer(name='config')
 
 def create_default_config_object() -> configparser.ConfigParser:
     """Create a default config object."""
-    config_parser = configparser.ConfigParser()
+    config_parser = configparser.ConfigParser(inline_comment_prefixes='#')
     config_parser["General"] = {"database": str(DEFAULT_DB_FILE_PATH)}
     config_parser["Format"] = DEFAULT_FORMAT_SPEC
     return config_parser
@@ -52,8 +53,8 @@ def init_app(db_path: Path, config_file_path: Path = CONFIG_FILE_PATH):
 
 
 def read_config(config_file: Path) -> configparser.ConfigParser:
-    logger.info(f"Reading database path from {config_file}")
-    config_parser = configparser.ConfigParser()
+    logger.info(f"Reading config file: {config_file}")
+    config_parser = configparser.ConfigParser(inline_comment_prefixes='#')
     config_parser.read(config_file)
     return config_parser
 
@@ -62,7 +63,9 @@ def get_database_path(config_file: Path) -> Path:
     """Read and returns the current path to the to-do database
     from the config file."""
     config_parser = read_config(config_file)
-    return Path(config_parser["General"]["database"])
+    db_path = config_parser["General"]["database"]
+    logger.info(f'Read db path: {db_path}')
+    return Path(db_path)
 
 
 def get_format(config_file: Path) -> configparser.SectionProxy | dict[str, str]:

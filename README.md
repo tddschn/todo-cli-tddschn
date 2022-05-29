@@ -195,8 +195,7 @@ Commands:
 Example config file:
 ```ini
 [General]
-home_dir = /Users/tscp # set it to your $HOME
-database = %(home_dir)s/.todo-cli-tddschn.db # or anywhere you'd like
+database = /Users/tscp/.todo-cli-tddschn.db # or anywhere you'd like
 
 [Format]
 # see https://strftime.org/ for the format specs
