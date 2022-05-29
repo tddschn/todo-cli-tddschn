@@ -3,7 +3,12 @@ from datetime import datetime
 from pathlib import Path
 from . import __app_name__, __version__, config, Status, Priority
 from . import logger, _DEBUG
-from .config import DEFAULT_DB_FILE_PATH, get_database_path
+from .config import (
+    DEFAULT_DB_FILE_PATH,
+    get_database_path,
+    CONFIG_FILE_PATH,
+    get_format,
+)
 from sqlmodel import Session, delete, case, nullslast, select, col
 from .database import create_db_and_tables, engine, get_project_with_name
 from .models import Project, Todo, ProjectCreate, ProjectRead, TodoCreate, TodoRead
@@ -22,7 +27,10 @@ app = typer.Typer(name='ls')
 def _list_todos(
     todos: list[Todo], filtered: bool = False, date_added_full: bool = False
 ) -> None:
-    todo_list = [todo_to_dict_with_project_name(x, date_added_full) for x in todos]
+    format_spec = get_format(CONFIG_FILE_PATH)
+    todo_list = [
+        todo_to_dict_with_project_name(x, date_added_full, format_spec) for x in todos
+    ]
     if filtered:
         no_todo_found_message = "No matching to-do found."
     else:

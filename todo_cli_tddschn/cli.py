@@ -100,7 +100,7 @@ def serve(
         raise typer.Abort()
 
 
-init_db_path_opt = typer.Option(
+db_path_opt = typer.Option(
     DEFAULT_DB_FILE_PATH,
     "--db-path",
     "-db",
@@ -110,7 +110,7 @@ init_db_path_opt = typer.Option(
 
 @app.command()
 def init(
-    db_path: Path = init_db_path_opt, config_file_path: Path = config.CONFIG_FILE_PATH
+    db_path: Path = db_path_opt, config_file_path: Path = config.CONFIG_FILE_PATH
 ) -> None:
     """Initialize the to-do database."""
     config.init_app(db_path, config_file_path)
@@ -126,7 +126,7 @@ def init(
 
 @app.command()
 def re_init(
-    db_path: Path = init_db_path_opt,
+    db_path: Path = db_path_opt,
     config_file_path: Path = config.CONFIG_FILE_PATH,
     force: bool = typer.Option(False, "--force", "-f", help="Force re-initialization"),
 ) -> None:

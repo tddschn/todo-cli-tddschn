@@ -7,6 +7,7 @@ from .models import Project, Todo
 import typer
 from tabulate import tabulate
 from . import __app_name__
+from .config import CONFIG_FILE_PATH, get_format
 
 
 def merge_desc(desc_l: list[str]) -> str:
@@ -14,12 +15,16 @@ def merge_desc(desc_l: list[str]) -> str:
 
 
 def format_datetime(
-    d: datetime, full: bool = False, date_format: str | None = None
+    d: datetime | None, full: bool = False, date_format: str | None = None
 ) -> str:
+    if d is None:
+        return ''
     if date_format is not None:
         return d.strftime(date_format)
     if full:
         return d.strftime('%Y-%m-%d %H:%M:%S')
+    if d.year == datetime.now().year:
+        return d.strftime('%m-%d')
     return d.strftime('%Y-%m-%d')
 
 
@@ -47,43 +52,45 @@ def todo_to_dict_with_project_name(
     # from icecream import ic
     # ic(d)
     attr_list_1 = ['id', 'description', 'priority', 'status']
-    attr_list_2 = [
-        'tags',
-        'due_date',
-    ]
+    # attr_list_2 = [
+    #     'tags',
+    #     'due_date',
+    # ]
     # 1
-    d_ordered = {k: d[k] for k in attr_list_1}
+    d_ordered = {k.title(): d[k] for k in attr_list_1}
     # 2
     if d['project_id'] is not None:
         project_id = d['project_id']
         with Session(engine) as session:
             project = session.get(Project, project_id)
             assert project is not None
-            d_ordered['project'] = project.name
+            d_ordered['Project'] = project.name
     else:
-        d_ordered['project'] = None
+        d_ordered['Project'] = None
 
     # 3
     # d_ordered |= {k: d[k] for k in attr_list_2}
     # tags
-    d_ordered['tags'] = ', '.join(deserialize_tags(d['tags']))
+    d_ordered['Tags'] = ', '.join(deserialize_tags(d['tags']))
     # due_date
     # typer.secho(type(todo.due_date))
-    if todo.due_date is not None:
-        d_ordered['due_date'] = format_datetime(
-            todo.due_date,
-            full=date_added_full_date,
-            date_format=format_specs['due_date'] if format_specs else None,
-        )
+    d_ordered['Due'] = format_datetime(
+        todo.due_date,
+        full=date_added_full_date,
+        date_format=format_specs['due_date']
+        if format_specs and 'due_date' in format_specs
+        else None,
+    )
 
     # 4
     # d_ordered |= {'date_added': format_datetime(d['date_added'], date_added_full_date)}
-    if todo.date_added is not None:
-        d_ordered['date_added'] = format_datetime(
-            todo.date_added,
-            full=date_added_full_date,
-            date_format=format_specs['date_added'] if format_specs else None,
-        )
+    d_ordered['Added'] = format_datetime(
+        todo.date_added,
+        full=date_added_full_date,
+        date_format=format_specs['date_added']
+        if format_specs and 'date_added' in format_specs
+        else None,
+    )
 
     return d_ordered
 
@@ -101,7 +108,11 @@ def _get_todo(
             typer.secho(f'No to-do with id {todo_id}', fg=typer.colors.RED, err=True)
         raise typer.Exit()
     if output:
-        todo_list = [todo_to_dict_with_project_name(todo, date_added_full)]
+        todo_list = [
+            todo_to_dict_with_project_name(
+                todo, date_added_full, get_format(CONFIG_FILE_PATH)
+            )
+        ]
         table = tabulate(todo_list, headers='keys')
         typer.secho(table)
     return todo
