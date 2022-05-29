@@ -33,3 +33,12 @@ def export_todos():
 #         session.exec("ALTER TABLE todos ADD COLUMN date_added DATETIME")
 #         session.commit()
 #         typer.secho("Done")
+
+
+@app.command('fill-date-added-column')
+def fill_column():
+    """fill date_added column with the epoch time if it's null"""
+    with Session(engine) as session:
+        session.exec("UPDATE todo SET date_added = datetime('now') WHERE date_added IS NULL")  # type: ignore
+        session.commit()
+        typer.secho("Done")

@@ -3,6 +3,8 @@
 from datetime import date, datetime
 from pathlib import Path
 import typer
+
+from todo_cli_tddschn import utils_commands
 from . import (
     __app_name__,
     __version__,
@@ -33,7 +35,7 @@ app = typer.Typer(name=__app_name__)
 app.add_typer(config.app, name='config')
 app.add_typer(list_commands.app, name='ls')
 app.add_typer(info_commands.app, name='info')
-app.add_typer(info_commands.app, name='info')
+app.add_typer(utils_commands.app, name='utils')
 
 
 def _check_db_exists() -> bool:
