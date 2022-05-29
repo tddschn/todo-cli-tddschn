@@ -1,15 +1,29 @@
 #!/usr/bin/env python3
 
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 import typer
-from . import __app_name__, __version__, __app_name_full__, config, list_command, info_command, Status, Priority
+from . import (
+    __app_name__,
+    __version__,
+    __app_name_full__,
+    config,
+    list_command,
+    info_command,
+    Status,
+    Priority,
+)
 from . import logger, _DEBUG
 from .config import DEFAULT_DB_FILE_PATH, get_database_path
 from sqlmodel import Session, delete
 from .database import create_db_and_tables, engine, get_project_with_name
 from .models import Project, Todo, ProjectCreate, ProjectRead, TodoCreate, TodoRead
-from .utils import merge_desc, serialize_tags, deserialize_tags, todo_to_dict_with_project_name
+from .utils import (
+    merge_desc,
+    serialize_tags,
+    deserialize_tags,
+    todo_to_dict_with_project_name,
+)
 from tabulate import tabulate
 
 # logger = None
@@ -33,7 +47,8 @@ def _check_db_exists_typer() -> None:
         typer.secho(
             f'Database not initialized. Run `todo init` to initialize.',
             fg=typer.colors.RED,
-            err=True)
+            err=True,
+        )
         raise typer.Abort()
 
 
@@ -65,14 +80,16 @@ def serve(
     try:
         import uvicorn  # type: ignore
         from .app import app
-        uvicorn.run(app, host=host, port=port, log_level=log_level)
+
+        uvicorn.run(app, host=host, port=port, log_level=log_level)  # type: ignore
     except ModuleNotFoundError:
         typer.secho(
             f'uvicorn or fastapi not installed.\n'
             f'Install it with `pip install uvicorn fastapi`\n'
             f'Or `pip install {__app_name_full__}[api]`',
             fg=typer.colors.RED,
-            err=True)
+            err=True,
+        )
         raise typer.Abort()
 
 
@@ -85,19 +102,18 @@ init_db_path_opt = typer.Option(
 
 
 @app.command()
-def init(db_path: Path = init_db_path_opt,
-         config_file_path: Path = config.CONFIG_FILE_PATH) -> None:
+def init(
+    db_path: Path = init_db_path_opt, config_file_path: Path = config.CONFIG_FILE_PATH
+) -> None:
     """Initialize the to-do database."""
     config.init_app(db_path, config_file_path)
     try:
         create_db_and_tables()
-        typer.secho('Database created successfully',
-                    fg=typer.colors.GREEN,
-                    err=True)
+        typer.secho('Database created successfully', fg=typer.colors.GREEN, err=True)
     except Exception as e:
-        typer.secho(f'Creating database failed with "{e}"',
-                    fg=typer.colors.RED,
-                    err=True)
+        typer.secho(
+            f'Creating database failed with "{e}"', fg=typer.colors.RED, err=True
+        )
         raise typer.Exit(1)
 
 
@@ -105,10 +121,7 @@ def init(db_path: Path = init_db_path_opt,
 def re_init(
     db_path: Path = init_db_path_opt,
     config_file_path: Path = config.CONFIG_FILE_PATH,
-    force: bool = typer.Option(False,
-                               "--force",
-                               "-f",
-                               help="Force re-initialization"),
+    force: bool = typer.Option(False, "--force", "-f", help="Force re-initialization"),
 ) -> None:
     """Re-initialize the to-do database.
     This will delete the current database and create a new one."""
@@ -125,38 +138,34 @@ def re_init(
         _re_init(db_path, config_file_path)
     else:
         typer.confirm(
-            "Are you sure you want to re-initialize the to-do database?",
-            abort=True)
+            "Are you sure you want to re-initialize the to-do database?", abort=True
+        )
         _re_init(db_path, config_file_path)
 
 
 @app.command('a')
 # @app.command()
 def add(
-        description: list[str] = typer.Argument(...),
-        priority: Priority = typer.Option(Priority.MEDIUM,
-                                          "--priority",
-                                          "-p",
-                                          case_sensitive=False),
-        status: Status = typer.Option(Status.TODO,
-                                      "--status",
-                                      "-s",
-                                      case_sensitive=False),
-        project: str = typer.Option(
-            None,
-            "--project",
-            "-pr",
-        ),
-        tags: list[str] = typer.Option(
-            None,
-            "--tags",
-            "-t",
-        ),
-        due_date: datetime = typer.Option(
-            None,
-            "--due-date",
-            "-dd",
-        ),
+    description: list[str] = typer.Argument(...),
+    priority: Priority = typer.Option(
+        Priority.MEDIUM, "--priority", "-p", case_sensitive=False
+    ),
+    status: Status = typer.Option(Status.TODO, "--status", "-s", case_sensitive=False),
+    project: str = typer.Option(
+        None,
+        "--project",
+        "-pr",
+    ),
+    tags: list[str] = typer.Option(
+        None,
+        "--tags",
+        "-t",
+    ),
+    due_date: datetime = typer.Option(
+        None,
+        "--due-date",
+        "-dd",
+    ),
 ) -> None:
     """Add a new to-do with a DESCRIPTION."""
     todo_create = TodoCreate(
@@ -172,9 +181,11 @@ def add(
         session.add(db_todo)
         session.commit()
         session.refresh(db_todo)
-        typer.secho(f'Added to-do # {db_todo.id}: "{db_todo.description}"',
-                    fg=typer.colors.GREEN,
-                    err=True)
+        typer.secho(
+            f'Added to-do # {db_todo.id}: "{db_todo.description}"',
+            fg=typer.colors.GREEN,
+            err=True,
+        )
 
 
 # @app.command(name="complete")
@@ -184,21 +195,26 @@ def add(
 
 @app.command(name='g')
 # @app.command(name='get')
-def get_todo(todo_id: int) -> None:
+def get_todo(
+    todo_id: int,
+    date_added_full: bool = typer.Option(
+        False, '--date-added-full', '-daf', help='Include time in the date_added column'
+    ),
+) -> None:
     """Get a to-do by ID."""
     with Session(engine) as session:
-        _get_todo(todo_id, session, True)
+        _get_todo(todo_id, session, True, date_added_full)
 
 
-def _get_todo(todo_id, session, output: bool = False) -> Todo:
+def _get_todo(
+    todo_id, session, output: bool = False, date_added_full: bool = False
+) -> Todo:
     todo = session.get(Todo, todo_id)
     if todo is None:
-        typer.secho(f'No to-do with id {todo_id}',
-                    fg=typer.colors.RED,
-                    err=True)
+        typer.secho(f'No to-do with id {todo_id}', fg=typer.colors.RED, err=True)
         raise typer.Exit()
     if output:
-        todo_list = [todo_to_dict_with_project_name(todo)]
+        todo_list = [todo_to_dict_with_project_name(todo, date_added_full)]
         table = tabulate(todo_list, headers='keys')
         typer.secho(table)
     return todo
@@ -214,36 +230,36 @@ def _get_todo(todo_id, session, output: bool = False) -> Todo:
 @app.command(name='m')
 # @app.command(name='modify')
 def modify(
-        # ctx: typer.Context,
-        todo_id: int = typer.Argument(...),
-        description: str = typer.Option(
-            None,
-            "--description",
-            "-d",
-        ),
-        priority: Priority = typer.Option(None,
-                                          "--priority",
-                                          "-p",
-                                          case_sensitive=False),
-        status: Status = typer.Option(None,
-                                      "--status",
-                                      "-s",
-                                      case_sensitive=False),
-        project: str = typer.Option(
-            None,
-            "--project",
-            "-pr",
-        ),
-        tags: list[str] = typer.Option(
-            None,
-            "--tags",
-            "-t",
-        ),
-        due_date: datetime = typer.Option(
-            None,
-            "--due-date",
-            "-dd",
-        ),
+    # ctx: typer.Context,
+    todo_id: int = typer.Argument(...),
+    description: str = typer.Option(
+        None,
+        "--description",
+        "-d",
+    ),
+    priority: Priority = typer.Option(None, "--priority", "-p", case_sensitive=False),
+    status: Status = typer.Option(None, "--status", "-s", case_sensitive=False),
+    project: str = typer.Option(
+        None,
+        "--project",
+        "-pr",
+    ),
+    tags: list[str] = typer.Option(
+        None,
+        "--tags",
+        "-t",
+    ),
+    due_date: datetime = typer.Option(
+        None,
+        "--due-date",
+        "-dd",
+    ),
+    date_added: datetime = typer.Option(
+        None,
+        "--date-added",
+        "-da",
+        # formats=['%Y-%m-%d'],
+    ),
 ) -> None:
     """Modify a to-do by setting it as done using its TODO_ID."""
     # print(ctx.args)
@@ -254,15 +270,17 @@ def modify(
         todo.description = description if description is not None else todo.description
         todo.priority = priority if priority is not None else todo.priority
         todo.status = status if status is not None else todo.status
-        todo.project_id = get_project_with_name(
-            project).id if project is not None else todo.project_id
+        todo.project_id = (
+            get_project_with_name(project).id
+            if project is not None
+            else todo.project_id
+        )
         todo.tags = serialize_tags(tags) if tags is not None else todo.tags
         todo.due_date = due_date if due_date is not None else todo.due_date
+        todo.date_added = date_added if date_added is not None else todo.date_added
         session.add(todo)
         session.commit()
-        typer.secho(f'Modified todo # {todo_id}:',
-                    fg=typer.colors.GREEN,
-                    err=True)
+        typer.secho(f'Modified todo # {todo_id}:', fg=typer.colors.GREEN, err=True)
         _get_todo(todo_id, session, True)
 
 
@@ -281,13 +299,12 @@ def remove(
     with Session(engine) as session:
         todo = _get_todo(todo_id, session)
         if not force:
-            typer.confirm(f'Are you sure you want to delete todo # {todo_id}?',
-                          abort=True)
+            typer.confirm(
+                f'Are you sure you want to delete todo # {todo_id}?', abort=True
+            )
         session.delete(todo)
         session.commit()
-        typer.secho(f'Removed todo # {todo_id}',
-                    fg=typer.colors.GREEN,
-                    err=True)
+        typer.secho(f'Removed todo # {todo_id}', fg=typer.colors.GREEN, err=True)
 
 
 @app.command(name="clear")
@@ -301,14 +318,13 @@ def remove_all(
     """Remove all to-dos."""
     with Session(engine) as session:
         if not force:
-            typer.confirm(f'Are you sure you want to delete all to-dos?',
-                          abort=True)
+            typer.confirm(f'Are you sure you want to delete all to-dos?', abort=True)
         statement = delete(Todo)
         result = session.exec(statement)  # type: ignore
         session.commit()
-        typer.secho(f'Removed {result.rowcount} to-dos',
-                    fg=typer.colors.GREEN,
-                    err=True)
+        typer.secho(
+            f'Removed {result.rowcount} to-dos', fg=typer.colors.GREEN, err=True
+        )
 
 
 @app.callback()

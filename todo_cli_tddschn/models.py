@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -29,7 +29,7 @@ class TodoUpdate(SQLModel):
 
 
 class TodoCreate(TodoBase):
-    pass
+    date_added: datetime | None = datetime.now()
 
 
 class TodoRead(TodoBase):
