@@ -179,7 +179,7 @@ and you need to migrate your todo database to v1.0.0 if you were using a previou
 Here's the how:
 
 - Install [alembic](https://alembic.sqlalchemy.org/en/latest/), the database migration tool.
-  ```
+  ```bash
   pip install alembic # or method of your choice
   ``` 
 
