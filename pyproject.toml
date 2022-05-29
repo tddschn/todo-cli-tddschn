@@ -29,6 +29,7 @@ sqlmodel = "^0.0.6"
 fastapi = {version = "^0.75.2", extras = ["api"]}
 uvicorn = {version = "^0.17.6", extras = ["api"]}
 prompt-toolkit = "^3.0.29"
+PyYAML = "^6.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.1"

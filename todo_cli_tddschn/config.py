@@ -10,7 +10,8 @@ from . import logger
 
 DEFAULT_DB_FILE_PATH = Path.home() / '.todo-cli-tddschn.db'
 CONFIG_DIR_PATH = Path(typer.get_app_dir(__app_name__))
-CONFIG_FILE_PATH = CONFIG_DIR_PATH / "config.ini"
+# CONFIG_FILE_PATH = CONFIG_DIR_PATH / "config.ini"
+CONFIG_FILE_PATH = CONFIG_DIR_PATH / "config.yaml"
 
 # escape % in ini
 # DEFAULT_DUE_DATE_FORMAT = '%%Y-%%m-%%d %%H:%%M:%%S'
