@@ -1,0 +1,6 @@
+database: "/Users/tscp/.todo-cli-tddschn.db" # or anywhere you'd like
+format:
+  due_date: "%m-%d"
+  date_added: "%m-%d"
+hide:
+  - "priority"
