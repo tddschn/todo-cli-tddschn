@@ -8,7 +8,6 @@ from tabulate import tabulate
 from . import __app_name__
 
 
-
 def merge_desc(desc_l: list[str]) -> str:
     return ' '.join(desc_l)
 
@@ -73,11 +72,16 @@ def todo_to_dict_with_project_name(
 
 
 def _get_todo(
-    todo_id, session: Session, output: bool = False, date_added_full: bool = False
+    todo_id,
+    session: Session,
+    output: bool = False,
+    date_added_full: bool = False,
+    echo_if_no_matching_todo: bool = True,
 ) -> Todo:
     todo = session.get(Todo, todo_id)
     if todo is None:
-        typer.secho(f'No to-do with id {todo_id}', fg=typer.colors.RED, err=True)
+        if echo_if_no_matching_todo:
+            typer.secho(f'No to-do with id {todo_id}', fg=typer.colors.RED, err=True)
         raise typer.Exit()
     if output:
         todo_list = [todo_to_dict_with_project_name(todo, date_added_full)]
@@ -91,7 +95,7 @@ def export_todo_command(todo_id: int) -> str:
     import shlex
 
     with Session(engine) as session:
-        todo = _get_todo(todo_id, session)
+        todo = _get_todo(todo_id, session, echo_if_no_matching_todo=False)
     todo_project = todo_to_dict_with_project_name(todo)['project']
     cmd = [
         __app_name__,
