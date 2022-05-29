@@ -14,6 +14,7 @@ A simple command-line Todo app made with typer, sqlite and a REST API.
     - [todo config](#todo-config)
     - [todo info](#todo-info)
     - [todo utils](#todo-utils)
+  - [Configuration](#configuration)
   - [Migrate to v1.0.0](#migrate-to-v100)
   - [Why do you made this?](#why-do-you-made-this)
   - [SQLite database schema](#sqlite-database-schema)
@@ -188,6 +189,27 @@ Commands:
   export                  Export todos to todo commands that can be used to re-construct your todo database
   fill-date-added-column  fill date_added column with the current time if it's null # used for migrate to v1.0.0
 ```
+
+## Configuration
+
+Example config file:
+```ini
+[General]
+home_dir = /Users/tscp # set it to your $HOME
+database = %(home_dir)s/.todo-cli-tddschn.db # or anywhere you'd like
+
+[Format]
+# see https://strftime.org/ for the format specs
+due_date = %%m-%%d
+date_added = %%m-%%d
+```
+
+You can install this file with the following command:
+```bash
+curl -o "$(todo config path)" https://raw.githubusercontent.com/tddschn/todo-cli-tddschn/master/examples/config.ini
+```
+
+
 
 ## Migrate to v1.0.0
 
