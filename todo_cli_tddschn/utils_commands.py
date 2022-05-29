@@ -37,7 +37,7 @@ def export_todos():
 
 @app.command('fill-date-added-column')
 def fill_column():
-    """fill date_added column with the epoch time if it's null"""
+    """fill date_added column with the current time if it's null"""
     with Session(engine) as session:
         session.exec("UPDATE todo SET date_added = datetime('now') WHERE date_added IS NULL")  # type: ignore
         session.commit()

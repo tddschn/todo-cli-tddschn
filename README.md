@@ -3,19 +3,21 @@
 A simple command-line Todo app made with typer, sqlite and a REST API.
 
 - [todo-cli-tddschn](#todo-cli-tddschn)
-	- [Features](#features)
-	- [Install](#install)
-		- [pipx (recommended)](#pipx-recommended)
-		- [pip](#pip)
-	- [Usage](#usage)
-		- [todo](#todo)
-		- [todo ls](#todo-ls)
-		- [todo serve](#todo-serve)
-		- [todo config](#todo-config)
-		- [todo info](#todo-info)
-	- [Why do you made this?](#why-do-you-made-this)
-	- [SQLite database schema](#sqlite-database-schema)
-	- [Screenshots](#screenshots)
+  - [Features](#features)
+  - [Install](#install)
+    - [pipx (recommended)](#pipx-recommended)
+    - [pip](#pip)
+  - [Usage](#usage)
+    - [todo](#todo)
+    - [todo ls](#todo-ls)
+    - [todo serve](#todo-serve)
+    - [todo config](#todo-config)
+    - [todo info](#todo-info)
+    - [todo utils](#todo-utils)
+  - [Migrate to v1.0.0](#migrate-to-v100)
+  - [Why do you made this?](#why-do-you-made-this)
+  - [SQLite database schema](#sqlite-database-schema)
+  - [Screenshots](#screenshots)
 
 ## Features
 - Creating, reading, updating, and deleting todos;
@@ -148,6 +150,51 @@ Options:
 Commands:
   count  Get todo counts
 ```
+
+### todo utils
+
+Utility commands.
+
+```
+todo utils --help
+Usage: todo utils [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  export                  Export todos to todo commands that can be used to re-construct your todo database
+  fill-date-added-column  fill date_added column with the current time if it's null # used for migrate to v1.0.0
+```
+
+## Migrate to v1.0.0
+
+`todo` v1.0.0 added a new column `date_added` to the `todo` table of the todo database,
+
+and you need to migrate your todo database to v1.0.0 if you were using a previous version.
+
+Here's the how:
+
+- Install [alembic](https://alembic.sqlalchemy.org/en/latest/), the database migration tool.
+  ```
+  pip install alembic # or method of your choice
+  ``` 
+
+- Run the migration scripts in this repository and fill the new column with the current time:
+  ```bash
+  # clone this repository
+  git clone https://github.com/tddschn/todo-cli-tddschn.git
+  cd todo-cli-tddschn
+
+  # migrate to new db schema
+  python -m alembic revision --autogenerate -m "Initial Migration"
+  python -m alembic upgrade head
+  python -m alembic revision --autogenerate -m "Add date_added to Todo model"
+  python -m alembic upgrade head
+
+  # fill the new column (make sure to upgrade to v1.0.1 first)
+  todo utils fill-date-added-column
+  ```
 
 
 ## Why do you made this?
