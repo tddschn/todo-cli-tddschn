@@ -4,7 +4,7 @@ A simple command-line Todo app made with typer, sqlite and a REST API.
 
 - [todo-cli-tddschn](#todo-cli-tddschn)
   - [Features](#features)
-  - [Install](#install)
+  - [Install, Upgrade and Uninstall](#install-upgrade-and-uninstall)
     - [pipx (recommended)](#pipx-recommended)
     - [pip](#pip)
   - [Usage](#usage)
@@ -25,20 +25,39 @@ A simple command-line Todo app made with typer, sqlite and a REST API.
 - `todo ls` lists all todos, ordered by priority and due date, the todos without a due date are put last (nullslast).
 - Not only the command line interface - you can also CRUD your todos by making HTTP requests to the [REST API](#todo-serve).
 
-## Install
+## Install, Upgrade and Uninstall
 
 ### pipx (recommended)
-```
-pipx install todo-cli-tddschn
-```
+- Install
+  ```bash
+  pipx install todo-cli-tddschn
+  ```
+- Upgrade
+  ```bash
+  pipx upgrade todo-cli-tddschn
+  ```
+- Uninstall
+  ```bash
+  pipx uninstall todo-cli-tddschn
+  ```
 
 About [`pipx`](https://pypa.github.io/pipx)
 
 
 ### [pip](https://pypi.org/project/todo-cli-tddschn)
-```
-pip install todo-cli-tddschn
-```
+- Install
+  ```bash
+  pip install todo-cli-tddschn
+  ```
+- Upgrade
+  ```bash
+  pip install --upgrade todo-cli-tddschn
+  ```
+- Uninstall
+  ```bash
+  pip uninstall todo-cli-tddschn
+  ```
+
 
 ## Usage
 
