@@ -341,7 +341,7 @@ def main(
     """
     # print(ctx.invoked_subcommand)
     # raise typer.Abort()
-    if ctx.invoked_subcommand not in ['init', 're-init']:
+    if ctx.invoked_subcommand not in ['init', 're-init', 'config']:
         _check_db_exists_typer()
 
 
