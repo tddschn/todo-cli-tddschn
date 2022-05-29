@@ -40,8 +40,7 @@ def init_app(db_path: Path, config_file_path: Path = CONFIG_FILE_PATH):
     and add db_path to the config file"""
     config_parser = create_default_config_object()
     try:
-        config_file_path.parent.mkdir(exist_ok=True)
-        config_file_path.touch(exist_ok=True)
+        touch_config_file(config_file_path)
         with CONFIG_FILE_PATH.open("w") as file:
             config_parser.write(file)
         typer.secho(f"Config file created at {config_file_path}", fg=typer.colors.GREEN)
@@ -51,6 +50,11 @@ def init_app(db_path: Path, config_file_path: Path = CONFIG_FILE_PATH):
             f'Creating config file {config_file_path} failed', fg=typer.colors.RED
         )
         raise typer.Exit(1)
+
+
+def touch_config_file(config_file_path):
+    config_file_path.parent.mkdir(exist_ok=True)
+    config_file_path.touch(exist_ok=True)
 
 
 def read_config(config_file: Path) -> configparser.ConfigParser:
@@ -90,6 +94,7 @@ def get_config_path() -> str:
 @app.command('edit')
 def edit_config() -> None:
     """Edit the config file."""
+    touch_config_file(CONFIG_FILE_PATH)
     typer.echo(f"Opening the config file at {CONFIG_FILE_PATH}")
     typer.launch(f"{CONFIG_FILE_PATH}")
 
