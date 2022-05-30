@@ -15,7 +15,8 @@ A simple command-line Todo app made with typer, sqlite and a REST API.
     - [todo info](#todo-info)
     - [todo utils](#todo-utils)
   - [Configuration](#configuration)
-  - [Migrate to v1.0.0](#migrate-to-v100)
+  - [Changelog](#changelog)
+  - [Migration Guide](#migration-guide)
   - [Why do you made this?](#why-do-you-made-this)
   - [SQLite database schema](#sqlite-database-schema)
   - [Screenshots](#screenshots)
@@ -192,55 +193,16 @@ Commands:
 
 ## Configuration
 
-Example config file:
-```ini
-[General]
-database = /Users/tscp/.todo-cli-tddschn.db # or anywhere you'd like
+The yaml configuration file is located at `todo config path`.
 
-[Format]
-# see https://strftime.org/ for the format specs
-due_date = %%m-%%d
-date_added = %%m-%%d
-```
+See [Configuration](migration.md#migrate-to-v200) for the details.
 
-You can install this file with the following command:
-```bash
-curl -o "$(todo config path)" https://raw.githubusercontent.com/tddschn/todo-cli-tddschn/master/examples/config.ini
-```
+## [Changelog](CHANGELOG.md)
 
+## Migration Guide
 
+You may find the [migration guide](migration.md) useful if you've upgraded the major version, e.g. from v1.0.0 to v2.0.0.
 
-## Migrate to v1.0.0
-
-`todo` v1.0.0 added a new column `date_added` to the `todo` table of the todo database,
-
-and you need to migrate your todo database to v1.0.0 if you were using a previous version.
-
-Here's the how:
-
-- Install [alembic](https://alembic.sqlalchemy.org/en/latest/), the database migration tool.
-  ```bash
-  pip install alembic # or method of your choice
-  ``` 
-
-- Run the migration scripts in this repository and fill the new column with the current time:
-  ```bash
-  # clone this repository
-  git clone https://github.com/tddschn/todo-cli-tddschn.git
-  cd todo-cli-tddschn
-
-  # edit alembic.ini, change the sqlalchemy.url to your database url
-  vim alembic.ini
-
-  # migrate to new db schema
-  python -m alembic revision --autogenerate -m "Initial Migration"
-  python -m alembic upgrade head
-  python -m alembic revision --autogenerate -m "Add date_added to Todo model"
-  python -m alembic upgrade head
-
-  # fill the new column (make sure to upgrade to v1.0.1 first)
-  todo utils fill-date-added-column
-  ```
 
 
 ## Why do you made this?

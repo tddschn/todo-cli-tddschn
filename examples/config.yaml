@@ -1,6 +1,9 @@
 database: "/Users/tscp/.todo-cli-tddschn.db" # or anywhere you'd like
 format:
+  # see https://strftime.org/ for the format specs
   due_date: "%m-%d"
   date_added: "%m-%d"
-hide:
-  - "priority"
+hide: # columns to hide for `ls` and `get` commands
+  - "status"
+  - "date_added"
+  # - "id"

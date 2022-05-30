@@ -91,6 +91,16 @@ def get_format(config_file: Path) -> dict[str, str]:
         return DEFAULT_FORMAT_DICT
 
 
+@cache
+def get_hide(config_file: Path) -> list[str]:
+    """Get hide specs from the config file."""
+    try:
+        hide_l = read_config(config_file)["hide"]
+        return list(map(str.lower, hide_l))
+    except:
+        return []
+
+
 @app.command('path')
 def get_config_path() -> str:
     """Get the path to the config file."""
