@@ -45,7 +45,7 @@ def str_self_or_empty(s) -> str:
 def todo_to_dict_with_project_name(
     todo: Todo,
     date_added_full_date: bool = False,
-    format_specs: SectionProxy | None = None,
+    format_specs: dict = get_format(CONFIG_FILE_PATH),
 ) -> dict[str, str]:
     d = todo.__dict__
     d.pop('_sa_instance_state', None)
@@ -75,11 +75,7 @@ def todo_to_dict_with_project_name(
     # due_date
     # typer.secho(type(todo.due_date))
     d_ordered['Due'] = format_datetime(
-        todo.due_date,
-        full=date_added_full_date,
-        date_format=format_specs['due_date']
-        if format_specs and 'due_date' in format_specs
-        else None,
+        todo.due_date, full=date_added_full_date, date_format=format_specs['due_date']
     )
 
     # 4
@@ -87,9 +83,7 @@ def todo_to_dict_with_project_name(
     d_ordered['Added'] = format_datetime(
         todo.date_added,
         full=date_added_full_date,
-        date_format=format_specs['date_added']
-        if format_specs and 'date_added' in format_specs
-        else None,
+        date_format=format_specs['date_added'],
     )
 
     return d_ordered

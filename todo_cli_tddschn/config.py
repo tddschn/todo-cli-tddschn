@@ -1,6 +1,7 @@
 """This module provides the RP To-Do config functionality."""
 
 # import configparser
+from functools import cache
 from pathlib import Path
 
 import typer
@@ -18,7 +19,7 @@ CONFIG_FILE_PATH = CONFIG_DIR_PATH / "config.yaml"
 DEFAULT_DUE_DATE_FORMAT = '%%m-%%d'
 # DEFAULT_DATE_ADDED_FORMAT = '%%Y-%%m-%%d'
 DEFAULT_DATE_ADDED_FORMAT = '%%m-%%d'
-DEFAULT_FORMAT_SPEC = {
+DEFAULT_FORMAT_DICT = {
     'due_date': DEFAULT_DUE_DATE_FORMAT,
     'date_added': DEFAULT_DATE_ADDED_FORMAT,
 }
@@ -68,7 +69,8 @@ def read_config(config_file: Path) -> dict:
     import yaml
 
     logger.info(f"Reading config file: {config_file}")
-    return yaml.safe_load(config_file.read_text())
+    config_dict = yaml.safe_load(config_file.read_text())
+    return config_dict
 
 
 def get_database_path(config_file: Path) -> Path:
@@ -77,9 +79,16 @@ def get_database_path(config_file: Path) -> Path:
     return Path(read_config(config_file)["database"])
 
 
+@cache
 def get_format(config_file: Path) -> dict[str, str]:
     """Get format specs from the config file."""
-    return read_config(config_file)["format"]
+    try:
+        format_dict = read_config(config_file)["format"]
+        default_format_dict_copy = DEFAULT_FORMAT_DICT.copy()
+        default_format_dict_copy.update(format_dict)
+        return default_format_dict_copy
+    except:
+        return DEFAULT_FORMAT_DICT
 
 
 @app.command('path')
