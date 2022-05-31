@@ -212,7 +212,7 @@ For practicing my python and SQL skills.
 If you're looking for an awesome CLI todo app, try [taskwarrior](https://taskwarrior.org/).
 ## SQLite database schema
 
-![schema](images/diagram.png)
+![schema](images/todo-cli-tddschn-erd-v1.png)
 
 ## Screenshots
 
