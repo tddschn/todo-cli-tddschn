@@ -155,3 +155,14 @@ def export_todo_to_todo_command(todo_id: int) -> str:
     if date_added := date_to_typer_datetime_str(todo.date_added):
         cmd.extend(['--date-added', date_added])
     return shlex.join(cmd)
+
+
+def sqlite_to_json():
+    pass
+
+
+def sqlmodel_set_inherit_cache_to_true():
+    from sqlmodel.sql.expression import Select, SelectOfScalar
+
+    SelectOfScalar.inherit_cache = True  # type: ignore
+    Select.inherit_cache = True  # type: ignore

@@ -18,6 +18,7 @@ from .utils import (
     deserialize_tags,
     todo_to_dict_with_project_name,
     format_datetime,
+    sqlmodel_set_inherit_cache_to_true,
 )
 from tabulate import tabulate
 
@@ -131,6 +132,7 @@ def order_by_priority_then_due_date(
 @app.command('tag')
 def filter_by_tags(tag: str):
     """Filter to-dos by tag."""
+    sqlmodel_set_inherit_cache_to_true()
     with Session(engine) as session:
         todos = session.exec(select(Todo).where(col(Todo.tags).like(f"%{tag}%"))).all()
     _list_todos(todos, True)
@@ -139,6 +141,7 @@ def filter_by_tags(tag: str):
 @app.command('project')
 def filter_by_project(project_name: str):
     """Filter to-dos by project."""
+    sqlmodel_set_inherit_cache_to_true()
     with Session(engine) as session:
         todos = session.exec(
             select(Todo).where(
