@@ -221,9 +221,13 @@ If you're looking for an awesome CLI todo app, try [taskwarrior](https://taskwar
 
 ## Screenshots
 
-![screenshot](images/screenshot.png)
+Thanks to @gudauu for these screenshots.
 
-![screenshot-2](images/screenshot-2.png)
+![screenshot](images/v2/ls-add-modify-info.png)
+![screenshot](images/v2/utils-export.png)
+![screenshot](images/v2/add-modify-info.png)
+![screenshot](images/v2/ls-ddb.png)
+![screenshot-2](images/v2/ls.png)
 
 ![todo-serve](images/todo-serve.png)
 
