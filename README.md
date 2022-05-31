@@ -221,7 +221,7 @@ If you're looking for an awesome CLI todo app, try [taskwarrior](https://taskwar
 
 ## Screenshots
 
-Thanks to @gudauu for these screenshots.
+Thanks to [@gudauu](https://github.com/gudauu) for these screenshots.
 
 ![screenshot](images/v2/ls-add-modify-info.png)
 ![screenshot](images/v2/utils-export.png)
