@@ -174,6 +174,7 @@ def add(
         "--due-date",
         "-dd",
     ),
+    date_added: datetime = typer.Option(None, "--date-added", "-da", hidden=True),
 ) -> None:
     """Add a new to-do with a DESCRIPTION."""
     todo_create = TodoCreate(
@@ -182,6 +183,7 @@ def add(
         status=status,
         tags=serialize_tags(tags),
         due_date=due_date,
+        date_added=date_added,
         project_id=get_project_with_name(project).id if project else None,
     )
     with Session(engine) as session:
