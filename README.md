@@ -113,6 +113,11 @@ Options:
   -pr, --project TEXT
   -t, --tags TEXT
   -dd, --due-date [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+  -ddb, --due-date-before [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+  -dda, --due-date-after [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+  -dab, --date-added-before [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+  -daa, --date-added-after [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+  -fda, --full-date-added         Include time in the date_added column
   --help                          Show this message and exit.
 
 Commands:
