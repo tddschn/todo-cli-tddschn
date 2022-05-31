@@ -45,6 +45,7 @@ def _list_todos(
 
 @app.callback(invoke_without_command=True)
 def order_by_priority_then_due_date(
+    ctx: typer.Context,
     description: str = typer.Option(
         None,
         "--description",
@@ -92,6 +93,8 @@ def order_by_priority_then_due_date(
     ),
 ):
     """list all to-dos, ordered by priority and due date."""
+    if ctx.invoked_subcommand is not None:
+        return
     whens = {'low': 0, 'medium': 1, 'high': 2}
     wheres = []
     if description is not None:

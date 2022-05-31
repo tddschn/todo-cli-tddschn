@@ -7,7 +7,12 @@ from .config import DEFAULT_DB_FILE_PATH, get_database_path
 from sqlmodel import Session, delete, func
 from .database import create_db_and_tables, engine, get_project_with_name
 from .models import Project, Todo, ProjectCreate, ProjectRead, TodoCreate, TodoRead
-from .utils import merge_desc, serialize_tags, deserialize_tags, todo_to_dict_with_project_name
+from .utils import (
+    merge_desc,
+    serialize_tags,
+    deserialize_tags,
+    todo_to_dict_with_project_name,
+)
 from tabulate import tabulate
 
 app = typer.Typer(name='info')
@@ -16,7 +21,7 @@ app = typer.Typer(name='info')
 # @app.command(name="list")
 # @app.command(name="ls")
 @app.callback(invoke_without_command=False)
-def info() -> None:
+def main() -> None:
     """Get infos about todos"""
 
 
