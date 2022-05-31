@@ -2,6 +2,7 @@
 
 from datetime import datetime
 import json
+from pathlib import Path
 from sqlmodel import Session, select
 from .database import engine
 from .models import Project, Todo
@@ -14,7 +15,14 @@ app = typer.Typer(name='utils')
 
 
 @app.command('export')
-def export_todos():
+def export_todos(
+    output_file: Path = typer.Option(
+        None,
+        '--output',
+        '-o',
+        help='Path to the output file to save the exported commands',
+    )
+) -> None:
     """Export todos to todo commands that can be used to restore your todo database,
     Only guaranteed to work in POSIX compliant shells."""
     # get all todo ids
@@ -23,7 +31,10 @@ def export_todos():
     export_commands = '\n'.join(
         export_todo_to_todo_command(todo_id) for todo_id in todo_ids
     )
-    typer.secho(export_commands)
+    if output_file is None:
+        typer.secho(export_commands)
+    else:
+        output_file.write_text(export_commands + '\n')
 
 
 # using alembic instead
