@@ -25,7 +25,7 @@ def main() -> None:
     """Get infos about todos"""
 
 
-@app.command()
+@app.command('count')
 def count():
     """Get count of todos"""
     with Session(engine) as session:

@@ -75,7 +75,7 @@ def _version_callback(value: bool) -> None:
 #     logger, _DEBUG = get_logger(do_log=value)
 
 
-@app.command()
+@app.command('serve')
 def serve(
     host: str = '127.0.0.1',
     port: int = 5000,
@@ -109,7 +109,7 @@ db_path_opt = typer.Option(
 )
 
 
-@app.command()
+@app.command('init')
 def init(
     db_path: Path = db_path_opt, config_file_path: Path = config.CONFIG_FILE_PATH
 ) -> None:
@@ -125,7 +125,7 @@ def init(
         raise typer.Exit(1)
 
 
-@app.command()
+@app.command('re-init')
 def re_init(
     db_path: Path = db_path_opt,
     config_file_path: Path = config.CONFIG_FILE_PATH,
