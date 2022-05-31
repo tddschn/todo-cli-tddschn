@@ -36,10 +36,23 @@ def deserialize_tags(tags_s: str) -> list[str]:
     return json.loads(tags_s)
 
 
-def str_self_or_empty(s) -> str:
-    if s is None:
+def date_to_typer_datetime_str(d: datetime | None) -> str | None:
+    if d is None:
+        return None
+    return datetime.strftime(d, '%Y-%m-%d %H:%M:%S')
+
+
+def get_project(project_id) -> Project:
+    with Session(engine) as session:
+        project = session.get(Project, project_id)
+        assert project is not None
+        return project
+
+
+def get_project_name(todo: Todo) -> str:
+    if todo.project_id is None:
         return ''
-    return str(s)
+    return get_project(todo.project_id).name
 
 
 def todo_to_dict_with_project_name(
@@ -61,14 +74,9 @@ def todo_to_dict_with_project_name(
     # 1
     d_ordered = {k.title(): d[k] for k in attr_list_1 if k in d}
     # 2
-    if 'project_id' in d and d['project_id'] is not None:
-        project_id = d['project_id']
-        with Session(engine) as session:
-            project = session.get(Project, project_id)
-            assert project is not None
-            d_ordered['Project'] = project.name
-    elif 'project' in d:
-        d_ordered['Project'] = None
+    d_ordered['Project'] = get_project_name(todo)
+    # elif 'project_id' in d:
+    #     d_ordered['Project'] = None
 
     # 3
     # d_ordered |= {k: d[k] for k in attr_list_2}
@@ -126,7 +134,7 @@ def export_todo_to_todo_command(todo_id: int) -> str:
 
     with Session(engine) as session:
         todo = _get_todo(todo_id, session, echo_if_no_matching_todo=False)
-    todo_project = todo_to_dict_with_project_name(todo)['project']
+    todo_project_name = get_project_name(todo)
     cmd = [
         __app_name__,
         'a',
@@ -135,15 +143,15 @@ def export_todo_to_todo_command(todo_id: int) -> str:
         todo.priority,
         '--status',
         todo.status,
-        '--due-date',
-        str_self_or_empty(todo.due_date),
-        '--date-added',
-        str_self_or_empty(todo.date_added),
     ]
-    if todo_project:
-        cmd.extend(['--project', todo_project])
+    if todo_project_name:
+        cmd.extend(['--project', todo_project_name])
     if todo.tags:
         tags: list[str] = json.loads(todo.tags)
         for tag in tags:
             cmd.extend(['-t', tag])
+    if due_date := date_to_typer_datetime_str(todo.due_date):
+        cmd.extend(['--due-date', due_date])
+    if date_added := date_to_typer_datetime_str(todo.date_added):
+        cmd.extend(['--date-added', date_added])
     return shlex.join(cmd)
