@@ -14,6 +14,7 @@ from . import (
     Priority,
     info_commands,
     list_commands,
+    utils_commands,
 )
 from . import logger, _DEBUG
 from .config import DEFAULT_DB_FILE_PATH, get_database_path
