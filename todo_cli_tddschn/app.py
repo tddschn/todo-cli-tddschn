@@ -2,7 +2,18 @@
 
 from fastapi import Depends, FastAPI, HTTPException, Query
 from sqlmodel import Field, Relationship, Session, SQLModel, create_engine, select
-from .models import Project, Todo, ProjectCreate, ProjectRead, TodoCreate, TodoRead, ProjectUpdate, TodoUpdate, ProjectReadWithTodos, TodoReadWithProject
+from .models import (
+    Project,
+    Todo,
+    ProjectCreate,
+    ProjectRead,
+    TodoCreate,
+    TodoRead,
+    ProjectUpdate,
+    TodoUpdate,
+    ProjectReadWithTodos,
+    TodoReadWithProject,
+)
 from .database import engine
 
 
@@ -29,10 +40,10 @@ def create_todo(*, session: Session = Depends(get_session), todo: TodoCreate):
 
 @app.get("/todos/", response_model=list[TodoRead])
 def read_todos(
-        *,
-        session: Session = Depends(get_session),
-        offset: int = 0,
-        limit: int = Query(default=100, lte=100),
+    *,
+    session: Session = Depends(get_session),
+    offset: int = 0,
+    limit: int = Query(default=100, lte=100),
 ):
     todos = session.exec(select(Todo).offset(offset).limit(limit)).all()
     return todos
@@ -47,10 +58,9 @@ def read_todo(*, session: Session = Depends(get_session), todo_id: int):
 
 
 @app.patch("/todos/{todo_id}", response_model=TodoRead)
-def update_todo(*,
-                session: Session = Depends(get_session),
-                todo_id: int,
-                todo: TodoUpdate):
+def update_todo(
+    *, session: Session = Depends(get_session), todo_id: int, todo: TodoUpdate
+):
     db_todo = session.get(Todo, todo_id)
     if not db_todo:
         raise HTTPException(status_code=404, detail="Todo not found")
@@ -75,9 +85,7 @@ def delete_todo(*, session: Session = Depends(get_session), todo_id: int):
 
 
 @app.post("/projects/", response_model=ProjectRead)
-def create_project(*,
-                   session: Session = Depends(get_session),
-                   project: ProjectCreate):
+def create_project(*, session: Session = Depends(get_session), project: ProjectCreate):
     db_project = Project.from_orm(project)
     session.add(db_project)
     session.commit()
@@ -87,10 +95,10 @@ def create_project(*,
 
 @app.get("/projects/", response_model=list[ProjectRead])
 def read_projects(
-        *,
-        session: Session = Depends(get_session),
-        offset: int = 0,
-        limit: int = Query(default=100, lte=100),
+    *,
+    session: Session = Depends(get_session),
+    offset: int = 0,
+    limit: int = Query(default=100, lte=100),
 ):
     projects = session.exec(select(Project).offset(offset).limit(limit)).all()
     return projects
@@ -124,8 +132,7 @@ def update_project(
 
 
 @app.delete("/projects/{project_id}")
-def delete_project(*, session: Session = Depends(get_session),
-                   project_id: int):
+def delete_project(*, session: Session = Depends(get_session), project_id: int):
     project = session.get(Project, project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")

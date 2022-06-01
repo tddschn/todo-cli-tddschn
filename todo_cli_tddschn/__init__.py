@@ -8,10 +8,12 @@ from typing import Any
 
 try:
     from logging_utils_tddschn import get_logger
+
     logger, _DEBUG = get_logger(__app_name__)
 except:
     import logging
     from logging import NullHandler
+
     logger = logging.getLogger(__app_name__)
     logger.addHandler(NullHandler())
 
@@ -26,6 +28,7 @@ class Priority(str, Enum):
 
 class Status(str, Enum):
     """Status of a to-do."""
+
     TODO = 'todo'
     DONE = 'done'
     DELETED = 'deleted'
