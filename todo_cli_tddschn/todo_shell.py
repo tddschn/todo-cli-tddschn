@@ -6,6 +6,10 @@ from typer.testing import CliRunner
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import InMemoryHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prompt_toolkit.application import run_in_terminal
+from prompt_toolkit.key_binding import KeyBindings
+
+bindings = KeyBindings()
 
 session = PromptSession()
 runner = CliRunner()
@@ -21,6 +25,12 @@ from prompt_toolkit.completion import WordCompleter
 command_completer = WordCompleter(
     list(filter(None, (registered_command_names + registered_group_names)))
 )
+
+
+@bindings.add('c-t')
+def _(event):
+    "Exit when `c-d` is pressed."
+    event.app.exit()
 
 
 def main() -> None:
