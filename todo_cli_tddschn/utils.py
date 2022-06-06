@@ -166,3 +166,7 @@ def sqlmodel_set_inherit_cache_to_true():
 
     SelectOfScalar.inherit_cache = True  # type: ignore
     Select.inherit_cache = True  # type: ignore
+
+
+# def datetime_option_callback(value: str) -> datetime:
+#     pass
