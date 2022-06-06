@@ -24,7 +24,7 @@ typer = "^0.4.1"
 colorama = "0.4.4"
 shellingham = "1.4.0"
 tabulate = "^0.8.9"
-logging-utils-tddschn = "^0.1.9"
+logging-utils-tddschn = "^0.1.10"
 sqlmodel = "^0.0.6"
 fastapi = {version = "^0.75.2", extras = ["api"]}
 uvicorn = {version = "^0.17.6", extras = ["api"]}
